@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.birenheide.bf.ed.BrainfuckEditor"
+            contributorClass="org.birenheide.bf.ed.BfEditorActionContributor"
+            default="true"
+            extensions="bf"
+            icon="icons/template.gif"
+            id="org.birenheide.bf.BrainfuckEditor"
+            name="Brainfuck Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate"
+            delegateDescription="Running and Debugging of Brainfuck Files"
+            delegateName="Brainfuck Launcher"
+            id="org.birenheide.bf.launchConfigurationType"
+            modes="run, debug"
+            name="Brainfuck"
+            public="true"
+            sourceLocatorId="org.birenheide.bf.sourceLocator"
+            sourcePathComputerId="org.birenheide.bf.sourcePathComputer">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.birenheide.bf.debug.ui.BfConfigurationTabGroup"
+            id="org.birenheide.bf.launchConfigurationTabGroup"
+            type="org.birenheide.bf.launchConfigurationType">
+         <launchMode
+               description="debug"
+               mode="debug"
+               perspective="org.eclipse.debug.ui.DebugPerspective">
+         </launchMode>
+         <launchMode
+               description="run"
+               mode="run">
+         </launchMode>
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="org.birenheide.bf.debug.ui.BfLaunchShortcut"
+            icon="icons/template.gif"
+            id="org.birenheide.bf.launch.shortcut"
+            label="Brainfuck Program"
+            modes="run, debug">
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           property="org.eclipse.debug.ui.matchesPattern"
+                           value="*.bf">
+                     </test>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.processFactories">
+      <processFactory
+            class="org.birenheide.bf.debug.core.BfProcessFactory"
+            id="org.birenheide.bf.processFactory">
+      </processFactory>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.birenheide.bf.launchConfigurationType"
+            icon="icons/template.gif"
+            id="org.birenheide.bf.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="org.birenheide.bf.debug.core.BfSourceLookupDirector"
+            id="org.birenheide.bf.sourceLocator"
+            name="Brainfuck Source Locator">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.birenheide.bf.debug.core.BfSourcePathComputer"
+            id="org.birenheide.bf.sourcePathComputer">
+      </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="org.birenheide.bf.debug.ui.BfDebugModelPresentation"
+            id="org.birenheide.bf.debugModelPresentation">
+      </debugModelPresentation>
+   </extension>
+
+</plugin>
