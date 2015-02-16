@@ -1,10 +1,24 @@
 package org.birenheide.bf.debug.core;
 
+import static org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate.AUTO_FLUSH_ATTR;
+import static org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate.FILE_ATTR;
+import static org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate.INPUT_FILE_ATTR;
+import static org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate.OUTPUT_FILE_ATTR;
+import static org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate.PROJECT_ATTR;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,35 +27,45 @@ import java.util.TreeMap;
 
 import org.birenheide.bf.BfActivator;
 import org.birenheide.bf.BrainfuckInterpreter;
+import org.birenheide.bf.Debuggable;
 import org.birenheide.bf.EventReason;
+import org.birenheide.bf.InterpreterException;
 import org.birenheide.bf.InterpreterListener;
 import org.birenheide.bf.InterpreterState;
-import org.birenheide.bf.debug.ui.BfMainTab;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.DebugElement;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 public class BfProcess implements IProcess {
 	
+	private static final String FALLBACK_CHARSET = "UTF-8";
+	
 	private final Map<String, String> attributes = new TreeMap<>();
 	private final String label;
 	private final ILaunch launch;
-	private final BrainfuckInterpreter interpreter;
+	private final Debuggable interpreter;
 	private final ProcessListener listener = new ProcessListener();
 	private final IStreamsProxy proxy;
+	private final BfOutputStream outStream;
+	private final PrintStream interpreterPrintStream;
+	private final InputStream interpreterInputStream;
+	private final IFile possibleOutputFile;
 
 	public BfProcess(ILaunch launch, String label, Map<String, String> attrs) throws CoreException {
 		this.label = label;
@@ -50,14 +74,59 @@ public class BfProcess implements IProcess {
 			this.attributes.putAll(attrs);
 		}
 		
-		BfStreamsProxy proxy = new BfStreamsProxy(true, false);
-		final BfOutputStream outStream = proxy.getOutputStream();
-		PrintStream out = new PrintStream(outStream);
+		String inputFilename = attrs.get(INPUT_FILE_ATTR);
+		String outputFilename = attrs.get(OUTPUT_FILE_ATTR);
+		boolean autoFlush = Boolean.parseBoolean(attrs.get(AUTO_FLUSH_ATTR));
+		String encoding = attrs.get(DebugPlugin.ATTR_CONSOLE_ENCODING);
+		
+		BfStreamsProxy proxy;
+		try {
+			proxy = new BfStreamsProxy(outputFilename == null, inputFilename == null, encoding);
+		} 
+		catch (IOException ex) {
+			throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, "Process could not be created", ex));
+		}
+		
+		
+		if (inputFilename != null) {
+			try {
+				this.interpreterInputStream = Files.newInputStream(Paths.get(inputFilename));
+			} 
+			catch (IOException ex) {
+				throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, "Process could not be created", ex));
+			}
+		}
+		else {
+			this.interpreterInputStream = proxy.getInputStream();
+		}
+		
+		this.outStream = proxy.getOutputStream();
+		this.outStream.setAutoFlush(autoFlush);
+		if (outputFilename != null) {
+			IPath path = Path.fromOSString(outputFilename);
+			this.possibleOutputFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+			try {
+				OutputStream os = Files.newOutputStream(Paths.get(outputFilename), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+				this.interpreterPrintStream = new PrintStream(os, true, encoding);
+			} 
+			catch (IOException ex) {
+				throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, "Process could not be created", ex));
+			}
+		}
+		else {
+			this.possibleOutputFile = null;
+			try {
+				this.interpreterPrintStream = new PrintStream(this.outStream, true, encoding);
+			} 
+			catch (UnsupportedEncodingException ex) {
+				throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, "Process could not be created", ex));
+			}
+		}
+		
 		this.proxy = proxy;
 		
-		ILaunchConfiguration config = launch.getLaunchConfiguration();
-		String projectName = config.getAttribute(BfMainTab.PROJECT_ATTR, "");
-		String fileName = config.getAttribute(BfMainTab.FILE_ATTR, "");
+		String projectName = attrs.get(PROJECT_ATTR);
+		String fileName = attrs.get(FILE_ATTR);
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (project == null) {
 			throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, "Project does not exist: " + projectName));
@@ -66,21 +135,29 @@ public class BfProcess implements IProcess {
 		if (!file.exists()) {
 			throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, "File does not exist: " + file.toString()));
 		}
-		InputStream in = file.getContents();
-		byte[] buffer = new byte[1024];
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		int len = -1;
-		try {
-			while ((len = in.read(buffer)) != -1) {
-				bos.write(buffer, 0, len);
-			}
-		} 
-		catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, e.getMessage(), e));
-		}
-		String code = new String(bos.toByteArray(), Charset.forName("UTF-8"));
-		this.interpreter = new BrainfuckInterpreter(code.toCharArray(), out, System.in);
+		String code = getContentsAsString(file);
+		this.interpreter = new BrainfuckInterpreter(code.toCharArray(), this.interpreterPrintStream, this.interpreterInputStream);
 		this.interpreter.addListener(listener);
+//		/*
+//		 * The launch framework has issues in the order of processing content obtained
+//		 * via IStreamMonitor.getContent() and content provided to the listener when
+//		 * there is already content when the listener is added. Therefore it is safer
+//		 * to wait until the first listener is added before starting the interpreter.
+//		 */
+//		Thread t = new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				if (outStream != null) {
+//					outStream.waitForListenerAdded();
+//				}
+//				interpreter.run();
+//			}
+//		}, "Brainfuck");
+//		t.setDaemon(true);
+//		t.start();
+	}
+
+	void startInterpreter() {
 		/*
 		 * The launch framework has issues in the order of processing content obtained
 		 * via IStreamMonitor.getContent() and content provided to the listener when
@@ -93,23 +170,103 @@ public class BfProcess implements IProcess {
 				if (outStream != null) {
 					outStream.waitForListenerAdded();
 				}
-				interpreter.run();
+				try {
+					if (interpreter instanceof Runnable) {
+						((Runnable) interpreter).run();
+					}
+				}
+				catch (InterpreterException ex) {
+					if (ex.getCause() instanceof InterruptedIOException) {
+						//Do nothing probably terminated in input wait
+					}
+					else {
+						BfActivator.getDefault().logError("Interpreter terminated unexpectedly", ex);
+					}
+				}
+				finally {
+					try {
+						interpreterInputStream.close();
+					} 
+					catch (IOException ex) {
+						BfActivator.getDefault().logError("Interpreter InputStream could not be closed", ex);
+					}
+					interpreterPrintStream.flush();
+					interpreterPrintStream.close();
+					if (possibleOutputFile != null) {
+						try {
+							possibleOutputFile.getParent().refreshLocal(IResource.DEPTH_ONE, null);
+						} 
+						catch (CoreException ex) {
+							BfActivator.getDefault().logError("Workspace output file could not be refreshed", ex);
+						}
+					}
+				}
 			}
 		}, "Brainfuck");
 		t.setDaemon(true);
 		t.start();
 	}
 
-	BrainfuckInterpreter getInterpreter() {
+	Debuggable getInterpreter() {
 		return this.interpreter;
 	}
 	
 	ProcessListener getProcessListener() {
 		return this.listener;
 	}
+
+	/**
+	 * @param file
+	 * @return
+	 * @throws CoreException
+	 */
+	String getContentsAsString(IFile file) throws CoreException {
+		InputStream in = file.getContents();
+		byte[] buffer = new byte[1024];
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		int len = -1;
+		try {
+			while ((len = in.read(buffer)) != -1) {
+				bos.write(buffer, 0, len);
+			}
+		} 
+		catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, e.getMessage(), e));
+		}
+		String code;
+		try {
+			code = new String(bos.toByteArray(), file.getCharset());
+		} 
+		catch (UnsupportedEncodingException ex) {
+			BfActivator.getDefault().logError(file + " has unsupported charset", ex);
+			code = new String(bos.toByteArray(), Charset.forName(FALLBACK_CHARSET));
+		}
+		return code;
+	}
 	
 	@Override
 	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+		if (adapter.equals(ConsoleStreamFlusher.class)) {
+			return new ConsoleStreamFlusher() {
+				
+				@Override
+				public void flush() {
+					if (BfProcess.this.outStream != null) {
+						try {
+							BfProcess.this.outStream.flush();
+						} 
+						catch (IOException ex) {
+							BfActivator.getDefault().logError("Stream could not be flushed", ex);
+						}
+					}
+				}
+				
+				@Override
+				public boolean canFlush() {
+					return BfProcess.this.outStream != null && !BfProcess.this.outStream.isAutoFlush();
+				}
+			};
+		}
 		return null;
 	}
 
@@ -166,7 +323,7 @@ public class BfProcess implements IProcess {
 		private volatile boolean isStopped = false;
 		private volatile boolean isSuspended = false;
 		private List<DebugElement> debugElements = Collections.synchronizedList(new ArrayList<DebugElement>(2));
-		private volatile int suspendedInstructionPointer = -1;
+		private volatile InterpreterState suspendedState = null;
 		private List<EventReason> lastSuspendedReasons = Collections.emptyList();
 		
 		void addEventSourceElement(DebugElement element) {
@@ -180,11 +337,20 @@ public class BfProcess implements IProcess {
 		}
 
 		int getInstructionPointer() {
-			if (this.isSuspended) {
-				return this.suspendedInstructionPointer;
+			if (this.isSuspended && this.suspendedState != null) {
+				return this.suspendedState.instructionPointer();
 			}
 			else {
 				return -1;
+			}
+		}
+		
+		InterpreterState getSuspendedState() {
+			if (this.isSuspended) {
+				return this.suspendedState;
+			}
+			else {
+				return null;
 			}
 		}
 		
@@ -206,7 +372,7 @@ public class BfProcess implements IProcess {
 
 		@Override
 		public void interpreterSuspended(InterpreterState state, List<EventReason> eventReasons) {
-			this.suspendedInstructionPointer = state.instructionPointer();
+			this.suspendedState = state;
 			this.lastSuspendedReasons = eventReasons;
 			this.isSuspended = true;
 			synchronized (this.debugElements) {
@@ -241,7 +407,19 @@ public class BfProcess implements IProcess {
 		public void interpreterFinished(InterpreterState state) {
 			this.isStopped = true;
 			this.isSuspended = false;
-			DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[]{new DebugEvent(BfProcess.this, DebugEvent.TERMINATE)});
+			IDebugTarget target = null;
+			if (DebugPlugin.getDefault() != null) {
+				synchronized (this.debugElements) {
+					for (DebugElement element : this.debugElements) {
+						element.fireTerminateEvent();
+						target = element.getDebugTarget();
+					}
+				}
+				DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[]{new DebugEvent(BfProcess.this, DebugEvent.TERMINATE)});
+				if (target != null && target instanceof BfDebugTarget) {
+					((BfDebugTarget) target).fireTerminateEvent();
+				}
+			}
 		}
 		
 		boolean isTerminated() {
@@ -258,19 +436,37 @@ public class BfProcess implements IProcess {
 		
 		private final BfStreamMonitor output;
 		private final IStreamMonitor error;
+		private final PrintStream pipedPrintStream;
+		private final InputStream pipedInputStream;
 		
-		BfStreamsProxy(boolean createOutputStream, boolean createInputStream) {
+		
+		BfStreamsProxy(boolean createOutputStream, boolean createInputStream, String encoding) throws IOException {
 			if (createOutputStream) {
-				this.output = new BfStreamMonitor();
+				this.output = new BfStreamMonitor(encoding);
 			}
 			else {
 				this.output = null;
 			}
 			this.error = null;
+			
+			if (createInputStream) {
+				PipedInputStream is = new PipedInputStream(1);
+				PipedOutputStream os = new PipedOutputStream(is);
+				this.pipedPrintStream = new PrintStream(os, true, encoding);
+				this.pipedInputStream = is;
+			}
+			else {
+				this.pipedInputStream = null;
+				this.pipedPrintStream = null;
+			}
 		}
 		
 		BfOutputStream getOutputStream() {
-			return this.output.getStream();
+			return this.output!= null ? this.output.getStream() : null;
+		}
+		
+		InputStream getInputStream() {
+			return this.pipedInputStream;
 		}
 
 		@Override
@@ -286,18 +482,19 @@ public class BfProcess implements IProcess {
 
 		@Override
 		public void write(String input) throws IOException {
-			// TODO Auto-generated method stub
-			
+			if (this.pipedPrintStream != null) {
+				this.pipedPrintStream.print(input);
+				this.pipedPrintStream.flush();
+			}
 		}
-
 	}
 	
 	private static class BfStreamMonitor implements IStreamMonitor {
 		
 		private final BfOutputStream stream;
 		
-		BfStreamMonitor() {
-			this.stream = new BfOutputStream(this);
+		BfStreamMonitor(String encoding) {
+			this.stream = new BfOutputStream(this, encoding);
 		}
 		
 		BfOutputStream getStream() {
@@ -332,10 +529,14 @@ public class BfProcess implements IProcess {
 		private final IStreamMonitor monitor;
 		private final List<IStreamListener> listeners = new ArrayList<IStreamListener>(1);
 		private final Object lock = new Object();
+		private final String encoding;
+		private boolean autoFlush;
 		private String content = null;
+		private int flushLength = 0;
 		
-		BfOutputStream(IStreamMonitor monitor) {
+		BfOutputStream(IStreamMonitor monitor, String encoding) {
 			this.monitor = monitor;
+			this.encoding = encoding;
 		}
 		
 		void waitForListenerAdded() {
@@ -359,15 +560,33 @@ public class BfProcess implements IProcess {
 				return content;
 			}
 			else {
-				return this.toString();
+				try {
+					return this.toString(encoding);
+				} 
+				catch (UnsupportedEncodingException ex) {
+					return this.toString();
+				}
 			}
+		}
+		
+		void setAutoFlush(boolean autoFlush) {
+			this.autoFlush = autoFlush;
+		}
+		
+		boolean isAutoFlush() {
+			return this.autoFlush;
 		}
 		
 		public synchronized void addListener(IStreamListener listener) {
 			if (!this.listeners.contains(listener)) {
 				this.listeners.add(listener);
 			}
-			this.content = this.toString();
+			try {
+				this.content = this.toString(encoding);
+			} 
+			catch (UnsupportedEncodingException ex) {
+				this.content = this.toString();
+			}
 			synchronized (this.lock) {
 				this.lock.notify();
 			}
@@ -379,26 +598,54 @@ public class BfProcess implements IProcess {
 
 		@Override
 		public synchronized void write(int b) {
-			int oldLength = this.toString().length();
+
 			super.write(b);
-			String appended = this.toString().substring(oldLength);
-//			System.out.println(oldLength + ":" + this.toString() + ":" + appended + ":" + this.listeners.size());
-			for (IStreamListener l : this.listeners) {
-				l.streamAppended(appended, monitor);
+			if (this.autoFlush) {
+				try {
+					this.flush();
+				} 
+				catch (IOException ex) {
+					BfActivator.getDefault().logError("Stream could not be autoflushed", ex);
+				}
 			}
 		}
 
 		@Override
 		public synchronized void write(byte[] b, int off, int len) {
-			int oldLength = this.toString().length();
 			super.write(b, off, len);
-			String appended = this.toString().substring(oldLength);
+			if (this.autoFlush) {
+				try {
+					this.flush();
+				} 
+				catch (IOException ex) {
+					BfActivator.getDefault().logError("Stream could not be autoflushed", ex);
+				}
+			}
+		}
+
+		@Override
+		public synchronized void flush() throws IOException {
+			super.flush();
+			String cont;
+			try {
+				cont = this.toString(encoding);
+				
+			} 
+			catch (UnsupportedEncodingException ex) {
+				BfActivator.getDefault().logError("Encoding problem", ex);
+				cont = this.toString();
+			}
+			String appended = cont.substring(flushLength);
+			flushLength = cont.length();
+			if (this.content != null) {
+				this.reset();
+				flushLength = 0;
+			}
+			
 //			System.out.println(oldLength + ":" + this.toString() + ":" + appended + ":" + this.listeners.size());
 			for (IStreamListener l : this.listeners) {
 				l.streamAppended(appended, monitor);
 			}
 		}
-		
 	}
-
 }

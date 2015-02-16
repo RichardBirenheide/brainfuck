@@ -1,5 +1,7 @@
 package org.birenheide.bf;
 
+import static org.birenheide.bf.BrainfuckInterpreter.DEFAULT_CHARSET;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -55,7 +57,7 @@ public class Main {
 			}
 			else if (arg.startsWith("out=")) {
 				String outputFilename = arg.substring("out=".length());
-				output = new PrintStream(outputFilename, "UTF-8");
+				output = new PrintStream(outputFilename, DEFAULT_CHARSET);
 			}
 			else if (arg.startsWith("dbg=")) {
 				debugFilename = arg.substring("dbg=".length());
@@ -73,7 +75,7 @@ public class Main {
 			sayUsage();
 			return;
 		}
-		String source = new String(Files.readAllBytes(filePath), "UTF-8");
+		String source = new String(Files.readAllBytes(filePath), DEFAULT_CHARSET);
 		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(source.toCharArray(), output, input);
 		if (debugFilename != null) {
 			Properties props = new Properties();
@@ -109,7 +111,8 @@ public class Main {
 				else {
 					val = (byte) Integer.parseInt(value);
 				}
-				interpreter.addWatchpoint(loc, val);
+				MemoryWatchpoint simpleWatchpoint = new SimpleWatchpoint(loc, val);
+				interpreter.addWatchpoint(simpleWatchpoint);
 			}
 		}
 	}
@@ -194,5 +197,32 @@ public class Main {
 		
 	}
 	
+	static class SimpleWatchpoint implements MemoryWatchpoint {
+		private final int location;
+		private final byte value;
+		
+		SimpleWatchpoint(int location, byte value) {
+			this.location = location;
+			this.value = value;
+		}
+		@Override
+		public int getLocation() {
+			return this.location;
+		}
 
+		@Override
+		public byte getValue() {
+			return this.value;
+		}
+
+		@Override
+		public boolean suspendOnAccess() {
+			return false;
+		}
+
+		@Override
+		public boolean suspendOnModification() {
+			return false;
+		}
+	}
 }

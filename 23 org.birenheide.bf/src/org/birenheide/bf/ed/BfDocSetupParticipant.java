@@ -15,13 +15,9 @@ public class BfDocSetupParticipant implements IDocumentSetupParticipant {
 		
 		if (document instanceof IDocumentExtension3) {
 			IDocumentExtension3 ext3 = (IDocumentExtension3) document;
+			
 			IDocumentPartitioner partitioner = new FastPartitioner(null, null);
 			ext3.setDocumentPartitioner(BF_PARTITIONING, partitioner);
 		}
-		
-		
-		
 	}
-
-	
 }

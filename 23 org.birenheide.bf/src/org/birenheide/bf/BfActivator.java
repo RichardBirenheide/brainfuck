@@ -1,7 +1,17 @@
 package org.birenheide.bf;
 
+import java.io.IOException;
+
+import org.birenheide.bf.debug.ui.BfUIListenerContributor;
+import org.birenheide.bf.ed.template.BfTemplateType;
+import org.birenheide.bf.ui.BfImages;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
+import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -11,6 +21,12 @@ public class BfActivator extends AbstractUIPlugin {
 	
 	private static BfActivator instance = null;
 	
+	private final BfUIListenerContributor uiContributor = new BfUIListenerContributor();
+	private TemplateStore templateStore = null;
+	private ContextTypeRegistry registry = null;
+
+	public final static String BF_PROBLEM_MARKER_ID = BUNDLE_SYMBOLIC_NAME + ".brainfuckProblemMarker";
+	
 	public static BfActivator getDefault() {
 		return instance;
 	}
@@ -19,14 +35,33 @@ public class BfActivator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		instance = this;
+		this.uiContributor.addListeners();
+		this.registry = new ContributionContextTypeRegistry(BfTemplateType.REGISTRY_ID);
+		this.templateStore = new ContributionTemplateStore(registry, this.getPreferenceStore(), BfPreferenceInitializer.TEMPLATE_KEY);
+		try {
+			this.templateStore.load();
+		} 
+		catch (IOException e) {
+			logError("Templates coud not be loaded", e);
+		}
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		instance = null;
+		this.uiContributor.removeListeners();
+		this.templateStore = null;
+		this.registry = null;
 		super.stop(context);
 	}
 	
+	public TemplateStore getTemplateStore() {
+		return this.templateStore;
+	}
+	
+	public ContextTypeRegistry getTemplateContextTypeRegistry() {
+		return this.registry;
+	}
 	
     public void logError(String message, Throwable cause) {
 
@@ -43,7 +78,12 @@ public class BfActivator extends AbstractUIPlugin {
         this.log(message, cause, IStatus.WARNING);
     }
 
-    private void log(String message, Throwable cause, int severity) {
+    @Override
+	protected void initializeImageRegistry(ImageRegistry reg) {
+		BfImages.initializeImageRegistry(reg);
+	}
+
+	private void log(String message, Throwable cause, int severity) {
 
         String pluginId = this.getBundle() != null ? this.getBundle().getSymbolicName() : BUNDLE_SYMBOLIC_NAME;
         if (message == null) {

@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" charset="ISO-8859-1" type="text/css">
+	<style type="text/css">
+	code.key { color:#A000A0; font-weight:bold; }
+	</style>
+	<title>Editor</title>
+</head>
+
+<body>
+<h1>Brainfuck Editor</h1>
+The Brainfuck Editor enhances the standard text editor with a few functions. 
+<ul>
+<li><b>Syntax Highlighting</b><br>
+	The Brainfuck key characters <code class="key">+ - &lt; &gt; . , [ ]</code> are colored. All other characters are
+	ignored and assumed to be comments being colored differently.
+</li>
+<li><b>Typing</b><br>
+	Typing an opening bracket <code class="key">[</code> can be completed automatically by a corresponding closing bracket <code class="key">]</code>.<br>
+	Indentation is automatically propagated to the next line.  
+</li>
+<li><b>Content Assist</b><br>
+	Content assist can be triggered any time (Default is CTRL-SPACE). This will show the applicable templates. Content assist can then be toggled to display the key characters.<br>
+	Note that some of the templates operate on non-Brainfuck characters preceding the trigger location as customized input to the template.  
+</li>
+<li><b>Error Checking</b><br>
+	Code is automatically checked for matching brackets.
+</li>
+</ul>
+Refer also to the <a href="./preferences.html#Editor">Editor Preferences</a> 
+</body>
+</html>

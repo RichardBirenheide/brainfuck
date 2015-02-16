@@ -1,7 +1,6 @@
 package org.birenheide.bf.debug.core;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.debug.ui.BfMainTab;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
@@ -19,7 +18,7 @@ public class BfSourceLookupDirector extends AbstractSourceLookupDirector
 		try {
 			ILaunchConfiguration config = this.getLaunchConfiguration();
 			if (config != null) {
-				String fileName = config.getAttribute(BfMainTab.FILE_ATTR, (String) null);
+				String fileName = config.getAttribute(BfLaunchConfigurationDelegate.FILE_ATTR, (String) null);
 				this.addParticipants(new ISourceLookupParticipant[] {new BfSourceLocatorParticipant(fileName)});
 			}
 			else {

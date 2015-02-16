@@ -1,0 +1,11 @@
+<toc label="Main" topic="html/maintopic.html">
+   <topic href="help/html/interpreter.html" label="Interpreter">
+   </topic>
+   <topic href="help/html/editor.html" label="Editor">
+   </topic>
+   <topic href="help/html/debug.html" label="Run/Debug">
+   </topic>
+   <topic href="help/html/preferences.html" label="Preferences">
+   </topic>
+
+</toc>

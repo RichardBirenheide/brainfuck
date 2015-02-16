@@ -1,0 +1,23 @@
+<contexts>
+   <context id="debug">
+      <description>This configuration type allows you to run/debug a Brainfuck File</description>
+      <topic href="help/html/debug.html" label="Brainfuck Run/Debug Support"/>
+   </context>
+   <context id="editor" title="Brainfuck Editor">
+      <description>The Brainfuck Editor allows you to edit Brainfuck (*.bf) files.</description>
+      <topic href="help/html/editor.html" label="Brainfuck Editor"/>
+      <topic href="help/html/debug.html" label="Brainfuck Debugging"/>
+      <command label="Editor Preferences" serialization="org.eclipse.ui.window.preferences(preferencePageId=org.birenheide.bf.Editor)"/>
+      <command label="Open Brainfuck Perspective" serialization="org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.birenheide.bf.Brainfuck)"/>
+   </context>
+   <context id="preferences">
+      <description>Preferences for Brainfuck Development</description>
+      <topic href="help/html/preferences.html" label="Brainfuck Preferences"/>
+   </context>
+   <context id="preferencesEditor">
+      <topic href="help/html/context/editorPrefs.html" label="Brainfuck Editor Preferences"/>
+   </context>
+   <context id="preferencesTemplates">
+      <topic href="help/html/preferences.html#Templates" label="Template Preferences"/>
+   </context>
+</contexts>

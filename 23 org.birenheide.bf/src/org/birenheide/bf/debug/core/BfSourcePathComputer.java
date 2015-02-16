@@ -1,6 +1,5 @@
 package org.birenheide.bf.debug.core;
 
-import org.birenheide.bf.debug.ui.BfMainTab;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -18,7 +17,7 @@ public class BfSourcePathComputer implements ISourcePathComputerDelegate {
 	@Override
 	public ISourceContainer[] computeSourceContainers(ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		String projectName = configuration.getAttribute(BfMainTab.PROJECT_ATTR, "");
+		String projectName = configuration.getAttribute(BfLaunchConfigurationDelegate.PROJECT_ATTR, "");
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (project != null) {
 			return new ISourceContainer[]{new ProjectSourceContainer(project, false)};

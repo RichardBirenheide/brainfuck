@@ -13,22 +13,41 @@ import java.util.Map;
 public class BrainfuckInterpreter implements Runnable, Debuggable {
 	
 	public static final char[] RESERVED_CHARS = {'<', '>', '+', '-', '.', ',', '[', ']'};
+	public static final String[] RESERVED_WORDS = new String[RESERVED_CHARS.length];
+	static {
+		for (int i = 0; i < RESERVED_CHARS.length; i++) {
+			RESERVED_WORDS[i] = new String(new char[]{RESERVED_CHARS[i]});
+		}
+	}
+	public static final String DEFAULT_CHARSET = "UTF-8";
 	private static final int MIN_SIZE = 10;
+	
+	public static boolean isReservedChar(char check) {
+		for (char c : RESERVED_CHARS) {
+			if (c == check) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	private final List<InterpreterListener> listeners = new ArrayList<>(1);
 	private final List<Integer> breakpoints = new ArrayList<>(1);
-	private final Map<Integer, List<Byte>> watchpoints = new HashMap<>();
-	private final char[] program;
+	private final Map<Integer, List<MemoryWatchpoint>> watchpoints = new HashMap<>();
+	private char[] program;
 	private final PrintStream out;
 	private final InputStream in;
-	private final InterpreterState state = new StateWrapper();
+	private volatile InterpreterState state = null;
 	private volatile boolean suspend = false;
 	private List<EventReason> suspendRequestReasons = Collections.synchronizedList(new ArrayList<EventReason>(3));
 	private Thread interpreterThread = null;
-//	private volatile boolean stepping = false;
 	
 	private final Object suspendLock = new Object();
-//	private final Object steppingLock = new Object();
+	private final Object programExchangeLock = new Object();
+	
+	private volatile int instructionPointer = 0;
+	private volatile int dataPointer = 0;
+	private volatile byte[] data = new byte[MIN_SIZE];
 	
 	public BrainfuckInterpreter(char[] program, PrintStream out, InputStream in) {
 		this.program = program;
@@ -36,16 +55,13 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 		this.in = in;
 	}
 	
-	private int instructionPointer = 0;
-	private int dataPointer = 0;
-	private byte[] data = new byte[MIN_SIZE];
-	
 	public void run() {
 		try {
 			this.interpreterThread = Thread.currentThread();
 			this.notifyStarted();
 			while (instructionPointer < program.length) {
 				{//Debugger section
+					this.state = new StateWrapper();
 					if (this.breakpoints.contains(this.instructionPointer)) {
 						this.suspend = true;
 						this.addSuspendRequestReason(EventReason.BreakPoint);
@@ -68,7 +84,10 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 					}
 				} //End debugger section
 				
-				char instruction = program[instructionPointer];
+				char instruction;
+				synchronized (this.programExchangeLock) {
+					instruction = program[instructionPointer];
+				}
 				switch (instruction) {
 					case '>': dataPointer++;
 							ensureDataCapacity();
@@ -76,6 +95,9 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 							break;
 					case '<': {
 							dataPointer--;
+							if (dataPointer < 0) {
+								throw new InterpreterException("Illegal Data Pointer");
+							}
 							notifyDataPointerChanged();
 							break;
 					}
@@ -91,14 +113,16 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 					}
 					case '.': {
 						int c = data[dataPointer] & 0xFF;
-						out.print((char) c);
+//						System.out.println(c);
+						out.write(c);
 						break;
 					}
 					case ',': {
 						try {
 							int b = in.read();
 							if (b > -1) {
-								data[dataPointer] = (byte) in.read();
+								data[dataPointer] = (byte) b;
+//								System.out.println(b + ":" + (data[dataPointer] & 0xff));
 								notifyDataChanged();
 							}
 						} 
@@ -108,44 +132,50 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 						break;
 					}
 					case '[': {
-						if (data[dataPointer] == 0) {
-							int openingBrackets = 1;
-							int startBracketPosition = instructionPointer;
-							instructionPointer++;
-							while (openingBrackets != 0) {
-								if (program[instructionPointer] == '[') {
-									openingBrackets++;
-								}
-								if (program[instructionPointer] == ']') {
-									openingBrackets--;
-								}
+						synchronized (this.programExchangeLock) {
+							if (data[dataPointer] == 0) {
+								int openingBrackets = 1;
+								int startBracketPosition = instructionPointer;
 								instructionPointer++;
-								if (instructionPointer >= program.length) {
-									throw new InterpreterException("No matching closing bracket at: " + startBracketPosition);
+								while (openingBrackets != 0) {
+									if (program[instructionPointer] == '[') {
+										openingBrackets++;
+									}
+									if (program[instructionPointer] == ']') {
+										openingBrackets--;
+									}
+									instructionPointer++;
+									if (instructionPointer >= program.length) {
+										throw new InterpreterException("No matching closing bracket at: " + startBracketPosition);
+									}
 								}
+								instructionPointer--; //Instruction pointer is one too far after last bracket close.
 							}
+							break;
 						}
-						break;	
 					}
 					case ']': {
-						if (data[dataPointer] != 0) {
-							int closingBrackets = 1;
-							int startBracketPosition = instructionPointer;
-							instructionPointer--;
-							while (closingBrackets != 0) {
-								if (program[instructionPointer] == ']') {
-									closingBrackets++;
-								}
-								if (program[instructionPointer] == '[') {
-									closingBrackets--;
-								}
+						synchronized (this.programExchangeLock) {
+							if (data[dataPointer] != 0) {
+								int closingBrackets = 1;
+								int startBracketPosition = instructionPointer;
 								instructionPointer--;
-								if (instructionPointer < 0) {
-									throw new InterpreterException("Non matching closing bracket at: " + startBracketPosition);
+								while (closingBrackets != 0) {
+									if (program[instructionPointer] == ']') {
+										closingBrackets++;
+									}
+									if (program[instructionPointer] == '[') {
+										closingBrackets--;
+									}
+									instructionPointer--;
+									if (instructionPointer < 0) {
+										throw new InterpreterException("Non matching closing bracket at: " + startBracketPosition);
+									}
 								}
+								instructionPointer++; //Put pointer right of the bracket
 							}
+							break;
 						}
-						break;
 					}
 				}
 				instructionPointer++;
@@ -155,6 +185,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 		finally {
 			this.notifyFinished();
 			this.interpreterThread = null;
+			this.state = null;
 		}
 	}
 	
@@ -193,33 +224,35 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 	}
 
 	@Override
-	public boolean addWatchpoint(int cell, byte value) {
-		List<Byte> values = null;
+	public boolean addWatchpoint(MemoryWatchpoint watchpoint) {
+		int cell = watchpoint.getLocation();
+		List<MemoryWatchpoint> watchpoints = null;
 		if (this.watchpoints.containsKey(cell)) {
-			values = this.watchpoints.get(cell);
+			watchpoints = this.watchpoints.get(cell);
 		}
 		else {
-			values = new ArrayList<>(1);
-			this.watchpoints.put(cell, values);
+			watchpoints = new ArrayList<>(1);
+			this.watchpoints.put(cell, watchpoints);
 		}
-		if (values.contains(value)) {
+		if (watchpoints.contains(watchpoint)) {
 			return false;
 		}
-		values.add(value);
+		watchpoints.add(watchpoint);
 		return true;
 	}
 
 	@Override
-	public boolean removeWatchpoint(int cell, byte value) {
+	public boolean removeWatchpoint(MemoryWatchpoint watchpoint) {
+		int cell = watchpoint.getLocation();
 		if (!this.watchpoints.containsKey(cell)) {
 			return false;
 		}
-		List<Byte> values = this.watchpoints.get(cell);
-		if (!values.contains(value)) {
+		List<MemoryWatchpoint> watchpoints = this.watchpoints.get(cell);
+		if (!watchpoints.contains(watchpoint)) {
 			return false;
 		}
-		values.remove(Byte.valueOf(value));
-		if (values.isEmpty()) {
+		watchpoints.remove(watchpoint);
+		if (watchpoints.isEmpty()) {
 			this.watchpoints.remove(cell);
 		}
 		return true;
@@ -271,6 +304,13 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 			this.interpreterThread.interrupt();
 		}
 	}
+	
+	@Override
+	public void replaceProgam(char[] newProgram) {
+		synchronized (this.programExchangeLock) {
+			this.program = newProgram;
+		}
+	}
 
 	private void notifyInstructionPointerChanged() {
 		for (InterpreterListener listener : this.listeners) {
@@ -279,6 +319,15 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 	}
 	
 	private void notifyDataPointerChanged() {
+		if (this.watchpoints.containsKey(this.dataPointer)) {
+			List<MemoryWatchpoint> watchpoints = this.watchpoints.get(this.dataPointer);
+			for (MemoryWatchpoint wp : watchpoints) {
+				if (wp.suspendOnAccess()) {
+					this.addSuspendRequestReason(EventReason.WatchPoint);
+					this.suspend = true;
+				}
+			}
+		}
 		for (InterpreterListener listener : this.listeners) {
 			listener.dataPointerChanged(this.state);
 		}
@@ -286,11 +335,21 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 	
 	private void notifyDataChanged() {
 		if (this.watchpoints.containsKey(this.dataPointer)) {
-			List<Byte> values = this.watchpoints.get(this.dataPointer);
-			if (values.contains(this.data[this.dataPointer])) {
-				this.addSuspendRequestReason(EventReason.WatchPoint);
-				this.suspend = true;
+			List<MemoryWatchpoint> watchpoints = this.watchpoints.get(this.dataPointer);
+			for (MemoryWatchpoint wp : watchpoints) {
+				if (wp.suspendOnModification()) {
+					this.addSuspendRequestReason(EventReason.WatchPoint);
+					this.suspend = true;
+				}
+				else if (wp.getValue() == this.data[this.dataPointer]) {
+					this.addSuspendRequestReason(EventReason.WatchPoint);
+					this.suspend = true;
+				}
 			}
+//			if (values.contains(this.data[this.dataPointer])) {
+//				this.addSuspendRequestReason(EventReason.WatchPoint);
+//				this.suspend = true;
+//			}
 		}
 		for (InterpreterListener listener : this.listeners) {
 			listener.dataContentChanged(this.state);

@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" charset="ISO-8859-1" type="text/css">
+	<script language="JavaScript" src="PLUGINS_ROOT/org.eclipse.help/livehelp.js"> </script>
+	<title></title>
+</head>
+
+<body>
+<h1>Brainfuck Interpreter Implementation</h1>
+<p>
+The Brainfuck editing feature comes with an integrated Brainfuck Interpreter written in Java. 
+The Java Archive for the interpreter can be extracted via the 
+<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.birenheide.bf.MainPage")'>preference</a> 
+main page.
+
+<h2>Interpreter implementation characteristics</h2>
+<ul>
+<li>
+<b>Size of internal memory</b><br>
+The size of the internal memory (navigable with <code><b>&lt;</b></code> and <code><b>&gt;</b></code>) will increase
+dynamically when the memory pointer exceeds the current size of the memory. This will not be boundary
+checked and stops when the JVM heap memory is exhausted. Starting the JVM with larger memory boundaries
+can increase the available memory.<br>
+When running in Eclipse, the interpreter is run within Eclipses JVM therefore the constraints apply
+with which Eclipse is run. 
+</li>
+<li>
+<b>Wrapping</b><br>
+The memory bytes will wrap on <code><b>+</b></code> and <code><b>-</b></code>.
+</li>
+<li>
+<b>Running the standalone Interpreter</b><br>
+java org.birenheide.bf.Main&nbsp;[in=&lt;filename&gt;]&nbsp;[out=&lt;filename&gt;]&nbsp;[dbg=&lt;filename&gt;]&nbsp;&lt;filename&gt;
+ <ul>
+ <li>in:  name of a file to read from in the brainfuck program; will read from command line if omitted</li>
+ <li>out: name of a file to write to in the brainfuck program; will write to command line if omitted</li>
+ <li>dbg: name of a file containing debug information; no debugging, if omitted. See <code>debug.properties</code> for usage</li>
+ <li>filename: mandatory file containing the brainfuck program</li>
+ </ul>
+</li>
+</ul>
+</p>
+</body>
+</html>

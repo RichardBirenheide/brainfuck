@@ -1,6 +1,7 @@
 package org.birenheide.bf.debug.ui;
 
 import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate;
 import org.birenheide.bf.debug.core.BfProcessFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -46,11 +47,9 @@ public class BfLaunchShortcut implements ILaunchShortcut {
 			ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(bfType);
 			ILaunchConfiguration matchingConfig = null;
 			for (ILaunchConfiguration config : configs) {
-				String confFile = config.getAttribute(BfMainTab.FILE_ATTR, "");
-				String project = config.getAttribute(BfMainTab.PROJECT_ATTR, "");
-//				System.out.println(project + "; " + confFile);
+				String confFile = config.getAttribute(BfLaunchConfigurationDelegate.FILE_ATTR, "");
+				String project = config.getAttribute(BfLaunchConfigurationDelegate.PROJECT_ATTR, "");
 				if (file.getProject().getName().equals(project) && file.getProjectRelativePath().toString().equals(confFile)) {
-					System.out.println("Config found: " + config.getName());
 					matchingConfig = config;
 					break;
 				}
@@ -62,8 +61,8 @@ public class BfLaunchShortcut implements ILaunchShortcut {
 				}
 				name = DebugPlugin.getDefault().getLaunchManager().generateLaunchConfigurationName(name);
 				ILaunchConfigurationWorkingCopy lc = bfType.newInstance(null, name);
-				lc.setAttribute(BfMainTab.FILE_ATTR, file.getProjectRelativePath().toString());
-				lc.setAttribute(BfMainTab.PROJECT_ATTR, file.getProject().getName());
+				lc.setAttribute(BfLaunchConfigurationDelegate.FILE_ATTR, file.getProjectRelativePath().toString());
+				lc.setAttribute(BfLaunchConfigurationDelegate.PROJECT_ATTR, file.getProject().getName());
 				lc.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, BfProcessFactory.FACTORY_ID);
 				lc.doSave();
 				matchingConfig = lc;

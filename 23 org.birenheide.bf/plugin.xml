@@ -1,17 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="annotationHover" name="Annotation Hover Contribution to Brainfuck Editor" schema="schema/annotationHover.exsd"/>
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.birenheide.bf.ed.BrainfuckEditor"
+            class="org.birenheide.bf.ed.BfEditor"
             contributorClass="org.birenheide.bf.ed.BfEditorActionContributor"
             default="true"
-            extensions="bf"
-            icon="icons/template.gif"
+            icon="icons/brainfuck.gif"
             id="org.birenheide.bf.BrainfuckEditor"
             name="Brainfuck Editor">
+         <contentTypeBinding
+               contentTypeId="org.birenheide.bf.brainfuck">
+         </contentTypeBinding>
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            default-charset="UTF-8"
+            file-extensions="bf"
+            id="org.birenheide.bf.brainfuck"
+            name="Brainfuck File"
+            priority="normal">
+      </content-type>
    </extension>
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
@@ -31,15 +45,16 @@
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
             class="org.birenheide.bf.debug.ui.BfConfigurationTabGroup"
+            helpContextId="org.birenheide.bf.debug"
             id="org.birenheide.bf.launchConfigurationTabGroup"
             type="org.birenheide.bf.launchConfigurationType">
          <launchMode
-               description="debug"
+               description="Debug a Brainfuck File"
                mode="debug"
                perspective="org.eclipse.debug.ui.DebugPerspective">
          </launchMode>
          <launchMode
-               description="run"
+               description="Run a Brainfuck File"
                mode="run">
          </launchMode>
       </launchConfigurationTabGroup>
@@ -48,7 +63,7 @@
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="org.birenheide.bf.debug.ui.BfLaunchShortcut"
-            icon="icons/template.gif"
+            icon="icons/brainfuck.gif"
             id="org.birenheide.bf.launch.shortcut"
             label="Brainfuck Program"
             modes="run, debug">
@@ -83,7 +98,7 @@
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
             configTypeID="org.birenheide.bf.launchConfigurationType"
-            icon="icons/template.gif"
+            icon="icons/brainfuck.gif"
             id="org.birenheide.bf.launchConfigurationTypeImage">
       </launchConfigurationTypeImage>
    </extension>
@@ -108,6 +123,504 @@
             class="org.birenheide.bf.debug.ui.BfDebugModelPresentation"
             id="org.birenheide.bf.debugModelPresentation">
       </debugModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.memoryRenderings">
+      <renderingBindings
+            defaultIds="org.birenheide.bf.hexRendering"
+            primaryId="org.birenheide.bf.hexRendering"
+            renderingIds="org.birenheide.bf.hexRendering,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.raw_memory">
+      </renderingBindings>
+      <renderingType
+            class="org.birenheide.bf.debug.ui.BfMemoryTypeDelegate"
+            id="org.birenheide.bf.hexRendering"
+            name="Brainfuck Memory">
+      </renderingType>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            description="Brainfuck Debugging"
+            id="org.birenheide.bf.debugging"
+            name="Brainfuck Debugging"
+            parentId="org.eclipse.debug.ui.debugging">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelContextBindings">
+      <modelContextBinding
+            contextId="org.birenheide.bf.debugging"
+            debugModelId="org.birenheide.bf.debugModelPresentation">
+      </modelContextBinding>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.detailPaneFactories">
+      <detailFactories
+            class="org.birenheide.bf.debug.ui.BfBreakpointDetailFactory"
+            id="org.birenheide.bf.breakpointDetailFactory">
+         <enablement>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false">
+                  <instanceof
+                        value="org.birenheide.bf.debug.core.IBfBreakpoint">
+                  </instanceof>
+               </iterate>
+            </with>
+         </enablement>
+      </detailFactories>
+   </extension>
+   <extension
+         id="brainfuckBreakpointMarker"
+         name="Brainfuck Breakpoint"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.debug.core.lineBreakpointMarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         id="brainfuckWatchpointMarker"
+         name="Brainfuck Watchpoint"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.debug.core.breakpointMarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="org.birenheide.bf.debug.core.BfBreakpoint"
+            id="org.birenheide.bf.brainfuckBreakpoint"
+            markerType="org.birenheide.bf.brainfuckBreakpointMarker"
+            name="Brainfuck Breakpoint">
+      </breakpoint>
+      <breakpoint
+            class="org.birenheide.bf.debug.core.BfWatchpoint"
+            id="org.birenheide.bf.brainfuckWatchpoint"
+            markerType="org.birenheide.bf.brainfuckWatchpointMarker"
+            name="Brainfuck Watchpoint">
+      </breakpoint>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.contextViewBindings">
+      <contextViewBinding
+            autoOpen="true"
+            contextId="org.birenheide.bf.debugging"
+            viewId="org.eclipse.debug.ui.MemoryView">
+      </contextViewBinding>
+      <contextViewBinding
+            autoOpen="true"
+            contextId="org.birenheide.bf.debugging"
+            viewId="org.eclipse.debug.ui.RegisterView">
+      </contextViewBinding>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.birenheide.bf.ed.BfEditor"
+            class="org.birenheide.bf.EditorAdapterFactory">
+         <adapter
+               type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerUpdaters">
+      <updater
+            class="org.birenheide.bf.debug.ui.BreakpointMarkerUpdater"
+            id="org.birenheide.bf.debug.Updater"
+            markerType="org.birenheide.bf.brainfuckBreakpointMarker">
+      </updater>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.birenheide.bf.debug"
+            name="Brainfuck Debugging">
+      </category>
+      <command
+            categoryId="org.birenheide.bf.debug"
+            description="Forces the console output of a Brainfuck process to flush"
+            helpContextId="org.birenheide.bf.debug"
+            id="org.birenheide.bf.debug.flushConsole"
+            name="Force Flush">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.birenheide.bf.debug.flushConsole"
+            disabledIcon="platform:/plugin/org.eclipse.ui.console/icons/full/dlcl16/wordwrap.png"
+            icon="platform:/plugin/org.eclipse.ui.console/icons/full/elcl16/wordwrap.png">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.birenheide.bf.debug.ui.FlushConsoleHandler"
+            commandId="org.birenheide.bf.debug.flushConsole"
+            helpContextId="org.birenheide.bf.debug">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.birenheide.bf.BrainfuckEditor.EditorContext?before=additions">
+         <command
+               commandId="org.eclipse.debug.ui.commands.ToggleBreakpoint"
+               id="bfBreakpoint"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.birenheide.bf.ed.BfEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.birenheide.bf.debug.ui.WatchpointExtensionFactory"
+            locationURI="popup:org.birenheide.bf.BrainfuckEditor.EditorContext?after=bfBreakpoint">
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#TextRulerContext?before=additions">
+         <command
+               commandId="org.eclipse.debug.ui.commands.ToggleBreakpoint"
+               id="bfBreakpoint"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.birenheide.bf.ed.BfEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.debug.ui.ProcessConsoleType.#ContextMenu?before=additions">
+         <separator
+               name="org.birenheide.bf.debug.console"
+               visible="true">
+         </separator>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.debug.ui.ProcessConsoleType.#ContextMenu?after=org.birenheide.bf.debug.console">
+         <command
+               commandId="org.birenheide.bf.debug.flushConsole"
+               helpContextId="org.birenheide.bf.debug"
+               style="push"
+               tooltip="Force flushing of the Brainfuck process output">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeContexts">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <equals
+                           value="org.birenheide.bf.debugging">
+                     </equals>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.birenheide.bf.ui.BfPerspectiveFactory"
+            fixed="false"
+            icon="icons/brainfuck.gif"
+            id="org.birenheide.bf.Brainfuck"
+            name="Brainfuck">
+         <description>
+            Brainfuck Editing and Debugging
+         </description>
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.birenheide.bf.Brainfuck">
+         <actionSet
+               id="org.eclipse.debug.ui.breakpointActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.debug.ui.launchActionSet">
+         </actionSet>
+         <view
+               id="org.eclipse.ui.navigator.ProjectExplorer"
+               minimized="false"
+               ratio="0.2"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               visible="true">
+         </view>
+         <view
+               id="org.eclipse.ui.console.ConsoleView"
+               minimized="false"
+               ratio="0.7"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               visible="true">
+         </view>
+         <view
+               id="org.eclipse.ui.views.TaskList"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="true">
+         </view>
+         <view
+               id="org.eclipse.ui.views.ProblemView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="true">
+         </view>
+         <newWizardShortcut
+               id="org.birenheide.bf.newBrainfuckFile">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.ui.wizards.new.file">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.ui.wizards.new.project">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.ui.wizards.new.folder">
+         </newWizardShortcut>
+         <viewShortcut
+               id="org.eclipse.debug.ui.DebugView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.debug.ui.MemoryView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.navigator.ProjectExplorer">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.console.ConsoleView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.views.TaskList">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.views.ProblemView">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <contextType
+            class="org.birenheide.bf.ed.template.BfTemplateType"
+            id="org.birenheide.bf.brainfuck"
+            name="Brainfuck"
+            registryId="org.birenheide.bf.BfEditor">
+      </contextType>
+      <contextTypeRegistry
+            id="org.birenheide.bf.BfEditor">
+      </contextTypeRegistry>
+      <resolver
+            class="org.birenheide.bf.ed.template.BfMemShiftResolver"
+            contextTypeId="org.birenheide.bf.brainfuck"
+            description="Inserts (number) of memory pointer shifts. Negative parameter shifts left, positive shifts right"
+            type="mem_shift">
+      </resolver>
+      <resolver
+            class="org.birenheide.bf.ed.template.BfIncDecResolver"
+            contextTypeId="org.birenheide.bf.brainfuck"
+            description="Inserts (number) of increments/decrements. Negative parameter decrements, positive increments"
+            type="inc_dec">
+      </resolver>
+      <resolver
+            class="org.birenheide.bf.ed.template.BfParameterResolver"
+            contextTypeId="org.birenheide.bf.brainfuck"
+            description="Parses non Brainfuck characters. Separator is &apos;;&apos;. Parametrize with the index. Example ${param0:parse(0)}. This will set the variable &apos;param0&apos; to &apos;a&apos; if the completion is triggered on &apos;a;b;c&apos;. The variable returns nothing but can be refered to in other variables."
+            type="parse">
+      </resolver>
+      <resolver
+            class="org.birenheide.bf.ed.template.BfKeyResolver"
+            contextTypeId="org.birenheide.bf.brainfuck"
+            description="Evaluates to the text on which the template proposal was triggered"
+            type="trigger_key">
+      </resolver>
+      <include
+            file="templates/default.xml">
+      </include>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.birenheide.bf.BfPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.birenheide.bf.ui.BfMainPreferencePage"
+            id="org.birenheide.bf.MainPage"
+            name="Brainfuck">
+      </page>
+      <page
+            category="org.birenheide.bf.MainPage"
+            class="org.birenheide.bf.ui.BfTemplatePreferencePage"
+            id="org.birenheide.bf.Templates"
+            name="Templates">
+      </page>
+      <page
+            category="org.birenheide.bf.MainPage"
+            class="org.birenheide.bf.ui.BfEditorPreferencePage"
+            id="org.birenheide.bf.Editor"
+            name="Editor">
+      </page>
+      <page
+            category="org.birenheide.bf.MainPage"
+            class="org.birenheide.bf.debug.ui.DebugPreferencePage"
+            id="org.birenheide.bf.Debug"
+            name="Run/Debug">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.birenheide.bf.Brainfuck"
+            name="Brainfuck">
+      </category>
+      <wizard
+            canFinishEarly="false"
+            category="org.birenheide.bf.Brainfuck"
+            class="org.birenheide.bf.ui.wizard.NewFileWizard"
+            finalPerspective="org.birenheide.bf.Brainfuck"
+            hasPages="true"
+            icon="icons/brainfuck.gif"
+            id="org.birenheide.bf.newBrainfuckFile"
+            name="Brainfuck File">
+         <description>
+            Create a new Brainfuck file
+         </description>
+      </wizard>
+   </extension>
+   <extension
+         id="brainfuckProblemMarker"
+         name="Brainfuck Problem"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="true">
+      </persistent>
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="help/bfToc.xml"
+            primary="true">
+      </toc>
+      <toc
+            file="help/toc.xml">
+      </toc>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="help/bfContextHelp.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.statusHandlers">
+      <statusHandler
+            class="org.birenheide.bf.debug.ui.ErrorDialogStatusHandler"
+            code="1"
+            id="org.birenheide.bf.debug.errorInFile"
+            plugin="org.birenheide.bf">
+      </statusHandler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            name="org.birenheide.bf.debug.currentIP"
+            super="org.eclipse.debug.ui.currentIP">
+      </type>
+      <type
+            markerType="org.birenheide.bf.brainfuckBreakpointMarker"
+            name="org.birenheide.bf.debug.breakpoint"
+            super="org.eclipse.debug.core.breakpoint">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationImageProvider="org.birenheide.bf.debug.ui.InstructionPointerAnnotationImageProvider"
+            annotationType="org.birenheide.bf.debug.currentIP"
+            colorPreferenceKey="org.birenheide.bf.debug.currentIP.color"
+            colorPreferenceValue="111,183,255"
+            highlightPreferenceKey="org.birenheide.bf.debug.currentIP.highlight"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="Brainfuck Instruction Pointer"
+            overviewRulerPreferenceKey="org.birenheide.bf.debug.currentIP.overviewRuler"
+            overviewRulerPreferenceValue="true"
+            textPreferenceKey="org.birenheide.bf.debug.currentIP.text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="org.birenheide.bf.debug.currentIP.textStyle"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="org.birenheide.bf.debug.currentIP.verticalRuler"
+            verticalRulerPreferenceValue="true">
+      </specification>
+      <specification
+            annotationType="org.birenheide.bf.debug.breakpoint"
+            colorPreferenceKey="org.birenheide.bf.debug.breakpoint.color"
+            colorPreferenceValue="0,0,255"
+            highlightPreferenceKey="org.birenheide.bf.debug.breakpoint.highlight"
+            highlightPreferenceValue="false"
+            includeOnPreferencePage="true"
+            isGoToNextNavigationTarget="false"
+            isGoToNextNavigationTargetKey="org.birenheide.bf.debug.breakpoint.goToNextNavigation"
+            isGoToPreviousNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="org.birenheide.bf.debug.breakpoint.goToPreviousNavigation"
+            label="Brainfuck Breakpoints"
+            overviewRulerPreferenceKey="org.birenheide.bf.debug.breakpoint.overviewRuler"
+            overviewRulerPreferenceValue="false"
+            showInNextPrevDropdownToolbarAction="true"
+            showInNextPrevDropdownToolbarActionKey="org.birenheide.bf.debug.breakpoint.showInNextPrevDropDown"
+            textPreferenceKey="org.birenheide.bf.debug.text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="org.birenheide.bf.debug.breakpoint.textStyle"
+            textStylePreferenceValue="IBEAM"
+            verticalRulerPreferenceKey="org.birenheide.bf.debug.verticalRuler"
+            verticalRulerPreferenceValue="true">
+      </specification>
+   </extension>
+   <extension
+         point="org.birenheide.bf.annotationHover">
+      <annotationHoverClass
+            annotationType="org.birenheide.bf.debug.currentIP"
+            class="org.birenheide.bf.debug.ui.InstructionPointerAnnotationHover">
+      </annotationHoverClass>
    </extension>
 
 </plugin>

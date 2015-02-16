@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<templates>
+	<template 
+		autoinsert="true" 
+		context="org.birenheide.bf.brainfuck" 
+		deleted="false" 
+		description="Clears the current memory location" 
+		enabled="true" 
+		id="org.birenheide.bf.template.clear" 
+		name="clear">[-]</template>
+	<template 
+		autoinsert="true" 
+		context="org.birenheide.bf.brainfuck" 
+		deleted="false" 
+		description="Copy cell y to cell x using temp; use on pattern x;y;temp" 
+		enabled="true" 
+		id="org.birenheide.bf.template.copy" 
+		name="copy">Copy ${trigger_key}${x:param(0)}${y:param(1)}${temp:param(2)}
+${1:mem_shift(temp)}[-]
+${2:mem_shift(x,'-',temp)}[-]
+${3:mem_shift(y,'-',x)}[${4:mem_shift(x,'-',y)}+${5:mem_shift(temp,'-',x)}+${6:mem_shift(y,'-',temp)}-]
+${7:mem_shift(temp,'-',y)}[${6}+${7}-]</template>
+	<template 
+	autoinsert="true" 
+		context="org.birenheide.bf.brainfuck" 
+		deleted="false" 
+		description="Scans to the right until an empty cell is found" 
+		enabled="true"
+		id="org.birenheide.bf.template.rightscan"  
+		name="rightscan">[&gt;]</template>
+	<template 
+		autoinsert="true" 
+		context="org.birenheide.bf.brainfuck" 
+		deleted="false" 
+		description="Shifts memory pointer {n} positions" 
+		enabled="true"
+		id="org.birenheide.bf.template.memShift"  
+		name="memshift">${x:parse(0)}${:mem_shift(x)}</template>
+	<template 
+		autoinsert="true" 
+		context="org.birenheide.bf.brainfuck" 
+		deleted="false" 
+		description="Shifts memory pointer {n} positions" 
+		enabled="true"
+		id="org.birenheide.bf.template.IncDec"  
+		name="inc_dec">${x:parse(0)}${:inc_dec(x)}</template>
+</templates>

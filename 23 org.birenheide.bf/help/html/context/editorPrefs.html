@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title></title>
+	<script language="JavaScript" src="PLUGINS_ROOT/org.eclipse.help/livehelp.js"> </script>
+</head>
+
+<body>
+<h3>Breakpoint and Instruction Pointer visualization</h3>
+<p>
+As Brainfuck is not line oriented it is advisable to highlight the exact locations of Breakpoints and the 
+current Instruction Pointer. Therefore, both come with own annotations, to change their settings 
+navigate into the 'Text Editors' preferences and the 
+<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations")'>'Annotations'</a> sub section.
+Change the 'Text as' checkbox for 
+<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations#Brainfuck Breakpoints")'>'Brainfuck Breakpoints'</a> and 
+<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations#Brainfuck Instruction Pointer")'>'Brainfuck Instruction Pointer'</a>
+to visualize both locations precisely in the Editor. Locations of both span the location where they start to 
+the character next to them.
+</p>
+<p>
+<ul>
+<li>
+<h4>Highlight Matching Brackets</h4>
+Indicates whether matching loop brackets ('[' and ']') should be highlighted  when the cursor is 
+positioned at one of those.
+</li>
+
+<li>
+<h4>Matching Brackets Color</h4>
+The color of the matching highlighter (the box drawn around the matching bracket).
+</li>
+
+<li>
+<h4>Close Brackets automatically</h4>
+Indicates whether opening brackets should be closed automatically when typing an opening bracket.
+</li>
+
+<li>
+<h4>Key Character Color</h4>
+Color of the characters being key characters for Brainfuck.
+</li>
+
+<li>
+<h4>Other Character Color</h4>
+Color of all non-key characters of Brainfuck.
+</li>
+</ul>
+</p>
+</body>
+</html>

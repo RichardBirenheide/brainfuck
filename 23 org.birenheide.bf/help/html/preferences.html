@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<script language="JavaScript" src="PLUGINS_ROOT/org.eclipse.help/livehelp.js"> </script>
+	<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" charset="ISO-8859-1" type="text/css">
+	<title>Brainfuck Preferences</title>
+</head>
+
+<body>
+<h1>Brainfuck Preferences</h1>
+<p>
+The Java Archive for the Brainfuck interpreter can be downloaded from the main page.
+</p>
+<h2>
+<a name="Editor" href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.birenheide.bf.Editor")'>Editor</a>
+</h2>
+<h3>Breakpoint and Instruction Pointer visualization</h3>
+<p>
+As Brainfuck is not line oriented it is advisable to highlight the exact locations of Breakpoints and the 
+current Instruction Pointer. Therefore, both come with own annotations, to change their settings 
+navigate into the 'Text Editors' preferences and the 
+<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations")'>'Annotations'</a> sub section.
+Change the 'Text as' checkbox for 
+<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations#Brainfuck Breakpoints")'>'Brainfuck Breakpoints'</a> and 
+<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations#Brainfuck Instruction Pointer")'>'Brainfuck Instruction Pointer'</a>
+to visualize both locations precisely in the Editor. Locations of both span the location where they start to 
+the character next to them.
+</p>
+<p>
+<h3>Settings</h3>
+<ul>
+<li>
+<h4>Highlight Matching Brackets</h4>
+Indicates whether matching loop brackets ('[' and ']') should be highlighted  when the cursor is 
+positioned at one of those.
+</li>
+
+<li>
+<h4>Matching Brackets Color</h4>
+The color of the matching highlighter (the box drawn around the matching bracket).
+</li>
+
+<li>
+<h4>Close Brackets automatically</h4>
+Indicates whether opening brackets should be closed automatically when typing an opening bracket.
+</li>
+
+<li>
+<h4>Key Character Color</h4>
+Color of the characters being key characters for Brainfuck.
+</li>
+
+<li>
+<h4>Other Character Color</h4>
+Color of all non-key characters of Brainfuck.
+</li>
+</ul>
+</p>
+
+<h2>
+<a name="Templates" href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.birenheide.bf.Templates")'>Templates</a>
+</h2>
+	<p>
+	There are a few predefined templates. More Brainfuck patterns could be found on 
+	<a href="http://esolangs.org/wiki/Brainfuck_algorithms">Esolang Brainfuck Algorithms</a>. 
+	</p>
+    <p>
+      Template variables may be used in the template pattern. Variables are resolved
+      to their concrete value when the template is evaluated in its context. Variables may be specified
+      using <i>simple</i> or <i>full</i> syntax:
+    </p> 
+      <ul>
+        <li><strong>Simple</strong> variables take the following form:
+          <p><strong><code>${trigger_key}</code></strong></p>
+          <p>This defines a variable with name <code>trigger_key</code> that will resolve to the String which preceeds the code completion trigger.</p>
+        </li>
+        <li><strong>Full</strong> variables take the following form:
+          <p><strong><code>${three_shifts:mem_shift(3)}</code></strong></p>
+          <p>This defines a variable with name <code>three_shifts</code> that will resolve to 
+          <code>&gt;&gt;&gt;</code>. It can be referenced multiple times by simply giving its name 
+          without the type: <code>${three_shifts}</code>.
+          <br>Arguments to a full variable can be written verbatim if they are names or integers. 
+          If an argument includes other characters or spaces, then 
+          it has to be enclosed in single quotes <code>''</code>.<br>
+          If a variable is referenced in an argument of another value, its definition must precede
+          the reference otherwise it cannot be resolved in correct order.
+          </p>
+          
+        </li>
+      </ul>
+      
+    <h3><a name="template_vars">Template Variables</a></h3>
+    <p>Brainfuck context defines the following variables.
+    	<b>Note:</b> In the table below, <i>id</i> is a user-chosen name of a new variable.</p>
+    <table border="1" cellspacing="0" cellpadding="5" width="100%" summary="General Template Variables">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody valign="baseline">
+        <tr>
+          <td><strong>${cursor}</strong></td>
+          <td>Specifies the cursor position when the template edit mode is left. This is useful when the cursor should jump to another place than to the end of the template on
+              leaving template edit mode.</td>
+        </tr>
+        <tr>
+          <td><strong>${date}</strong></td>
+          <td>Evaluates to the current date.</td>
+        </tr>
+        <tr>
+          <td><strong>${dollar}</strong></td>
+          <td>Evaluates to the dollar symbol <code>$</code>. Alternatively, two dollars can be used: <code>$$</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>${<i>id</i>:inc_dec(<i>n</i>)}</strong> or <br>
+              <strong>${<i>id</i>:inc_dec(<i>n, operation, k</i>)}</strong></td>
+          <td>Evaluates to <i>n</i> increments or decrements. Positive values will increment, negative values will decrement.
+              Negative values can be preceded with the exclamation mark to avoid conflicts with the minus sign which is a Brainfuck key character.
+              <i>n</i> can also be a reference of a variable defined by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+              <p>Example:<br>
+              <code>${dec_three:inc_dec('-3')}</code> evaluates to <code>---</code><br>
+              <code>${x:parse(1)}${a:inc_dec(x)}</code> evaluates to <code>---</code> if the template is triggered after <code>1;!3</code> in the code.
+            </p>
+			<p>
+				<strong>${inc_dec}</strong> takes three arguments as well to allow calculations on positions. <strong><i>operation</i></strong> may take the following values:
+				<ul>
+				<li><strong>+</strong> for adding the first and the third argument</li>
+				<li><strong>plus</strong> for adding the first and the third argument</li>
+				<li><strong>-</strong> for subtracting the third from the first argument</li>
+				<li><strong>minus</strong> for subtracting the third from the first argument</li>
+				</ul>
+				This allows easy calculation of relative increments/decrements to a fixed argument obtained by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+			</p>
+			<p>
+				Example:<br>
+				<code>${x:parse(0)}${y:parse(1)}${a:inc_dec(x,'-',y)}</code> evaluates to <code>---</code> if the template is triggered after <code>4;7</code> in the code.<br>
+			</p>          
+          </td>
+        </tr>
+        <tr>
+          <td><strong>${<i>id</i>:mem_shift(<i>n</i>)}</strong> or <br>
+              <strong>${<i>id</i>:mem_shift(<i>n, operation, k</i>)}</strong></td>
+          <td>Evaluates to <i>n</i> shifts of the memory pointer. Positive values will shift to right, negative values will shift to left.
+              Negative values can be preceded with the exclamation mark to avoid conflicts with the minus sign which is a Brainfuck key character.
+              <i>n</i> can also be a reference of a variable defined by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+              <p>Example:<br>
+              <code>${shift_three:mem_shift('-3')}</code> evaluates to <code>&lt;&lt;&lt;</code><br>
+              <code>${x:parse(1)}${a:mem_shift(x)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>1;!3</code> in the code.
+            </p>
+			<p>
+				<strong>${mem_shift}</strong> takes three arguments as well to allow calculations on positions. <strong><i>operation</i></strong> may take the following values:
+				<ul>
+				<li><strong>+</strong> for adding the first and the third argument</li>
+				<li><strong>plus</strong> for adding the first and the third argument</li>
+				<li><strong>-</strong> for subtracting the third from the first argument</li>
+				<li><strong>minus</strong> for subtracting the third from the first argument</li>
+				</ul>
+				This allows easy calculation of relative shifts to a fixed argument obtained by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+			</p>
+			<p>
+				Example:<br>
+				<code>${x:parse(0)}${y:parse(1)}${a:mem_shift(x,'-',y)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>4;7</code> in the code.<br>
+				A more elaborate example can be found in the built-in template <strong><i>copy</i></copy>.
+			</p>          
+          </td>
+        </tr>
+        <tr>
+          <td><strong>${<i>id</i>:parse(<i>n</i>)}</strong></td>
+          <td>Parses any non-Brainfuck characters to the left of the completion trigger in the source code. The characters are split around semicolon
+              and the <i>n</i>-th (zero-based) value will set to a variable named <i>id</i>. The expression itself will evaluate to an empty string but
+              can be refered to in arguments to other variables. It is advisable to parse "arguments" first in a template and to refer to these
+              in subsequent variable expressions.
+              <p>Example:<br>
+              <code>${first:parse(0)}</code> sets the value of <code>first</code> to <code>some</code> if the template is triggered on <code>some;thing</code> in the code.
+            </p>
+          
+          </td>
+        </tr>
+        <tr>
+          <td><strong>${line_selection}</strong></td>
+          <td>Evaluates to content of all currently selected lines.</td>
+        </tr>
+        <tr>
+          <td><strong>${time}</strong></td>
+          <td>Evaluates to the current time.</td>
+        </tr>
+        <tr>
+          <td><strong>${trigger_key}</strong></td>
+          <td>Evaluates to any non-Brainfuck characters to the left of the completion trigger in the source code.
+          <p>Example:<br>
+          <code>${trigger_key}</code> evaluates to <code>Some weird example</code> when triggered after the following snippet: <code>[+>-]Some weird example</code> in the code.
+          As <code>]</code> is the first Brainfuck key character when parsing to the left, all characters up to this one are part of the evaluation.
+          </p>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>${user}</strong></td>
+          <td>Evaluates to the user name.</td>
+        </tr>
+        <tr>
+          <td><strong>${word_selection}</strong></td>
+          <td>Evaluates to the content of the current text selection.</td>
+        </tr>
+        <tr>
+          <td><strong>${year}</strong></td>
+          <td>Evaluates to the current year.</td>
+        </tr>
+      </tbody>
+    </table>
+    
+ </body>
+</html>

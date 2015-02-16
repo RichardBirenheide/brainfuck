@@ -1,7 +1,7 @@
 package org.birenheide.bf.debug.core;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.debug.ui.BfMainTab;
+import org.birenheide.bf.InterpreterState;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
@@ -17,7 +17,7 @@ public class BfStackFrame extends BfDebugElement implements IStackFrame {
 	public BfStackFrame(BfDebugTarget target, BfThread thread, String name) {
 		super(target);
 		try {
-			name = target.getLaunch().getLaunchConfiguration().getAttribute(BfMainTab.FILE_ATTR, name);
+			name = target.getLaunch().getLaunchConfiguration().getAttribute(BfLaunchConfigurationDelegate.FILE_ATTR, name);
 		} 
 		catch (CoreException e) {
 			BfActivator.getDefault().logError("Configuration could not be read", e);
@@ -123,6 +123,10 @@ public class BfStackFrame extends BfDebugElement implements IStackFrame {
 	public int getCharStart() throws DebugException {
 		return getDebugTarget().getProcess().getProcessListener().getInstructionPointer();
 	}
+	
+	public int getMemoryPointer() {
+		return getDebugTarget().getProcess().getProcessListener().getSuspendedState().dataPointer();
+	}
 
 	@Override
 	public int getCharEnd() throws DebugException {
@@ -131,21 +135,26 @@ public class BfStackFrame extends BfDebugElement implements IStackFrame {
 
 	@Override
 	public String getName() throws DebugException {
-		String label = this.name + " at: " + this.getCharStart();
+		InterpreterState state = this.getDebugTarget().getProcess().getProcessListener().getSuspendedState();
+		int datapointer = -1;
+		if (state != null) {
+			datapointer = state.dataPointer();
+		}
+		String dataPointerLabel = "";
+		if (datapointer > -1) {
+			dataPointerLabel = "; mp=0x" + Integer.toHexString(datapointer).toUpperCase();
+		}
+		String label = this.name + " at: ip=" + this.getCharStart() + dataPointerLabel;
 		return label;
 	}
 
 	@Override
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
-		//TODO Look closer to register group concept
-		return new IRegisterGroup[0];
+		return this.ownerThread.getRegisters();
 	}
 
 	@Override
 	public boolean hasRegisterGroups() throws DebugException {
-		return false;
+		return this.ownerThread.isSuspended();
 	}
-	
-	
-
 }

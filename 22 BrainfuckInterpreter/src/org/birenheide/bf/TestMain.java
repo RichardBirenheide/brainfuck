@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class TestMain {
 	
-	private static final String HELLO_WORLD = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>. // >>>>>>+";
+//	private static final String HELLO_WORLD = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>. // >>>>>>+";
 	private static final String NESTED_HELLO_WORLD = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
 	
 	private static final String TEST = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>++++++++++++++++++++++++++++++";
@@ -20,7 +20,19 @@ public class TestMain {
 		TestListener l = new TestListener();
 		interpreter.addListener(l);
 		interpreter.addBreakpoint(115);
-		interpreter.addWatchpoint(88, (byte) 2);
+		interpreter.addWatchpoint(new Main.SimpleWatchpoint(88, (byte) 2));
+		interpreter.addWatchpoint(new Main.SimpleWatchpoint(88, (byte) 2){
+
+			@Override
+			public boolean suspendOnAccess() {
+				return true;
+			}
+
+			@Override
+			public boolean suspendOnModification() {
+				return false;
+			}
+		});
 		Thread i = new Thread(interpreter);
 		i.start();
 		while (!l.finished) {
