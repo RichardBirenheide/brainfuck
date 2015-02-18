@@ -7,33 +7,31 @@ import org.birenheide.bf.BrainfuckInterpreter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.editors.text.EditorsUI;
 
-class BfCodeScanner extends RuleBasedScanner {
-	
-	
+class BfCodeScanner extends BufferedRuleBasedScanner {
 	
 	BfCodeScanner(IPreferenceStore editorPreferenceStore) {
 		
 		List<IRule> rules= new ArrayList<>();
 		
-		rules.add(new BfRule(editorPreferenceStore));
+		rules.add(new BfCodeColorRule(editorPreferenceStore));
 		this.setRules(rules.toArray(new IRule[rules.size()]));
 	}
 	
 	
-	private static class BfRule implements IRule {
+	private static class BfCodeColorRule implements IRule {
 		
 		private final IPreferenceStore editorPreferenceStore;
 		
-		BfRule(IPreferenceStore editorPreferenceStore) {
+		BfCodeColorRule(IPreferenceStore editorPreferenceStore) {
 			this.editorPreferenceStore = editorPreferenceStore;
 		}
 
