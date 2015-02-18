@@ -114,8 +114,8 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
 	@Override
 	public String getConfiguredDocumentPartitioning(ISourceViewer sourceViewer) {
-//		return  BfDocSetupParticipant.BF_PARTITIONING;
-		return super.getConfiguredDocumentPartitioning(sourceViewer);
+		return  BfDocSetupParticipant.BF_PARTITIONING;
+//		return super.getConfiguredDocumentPartitioning(sourceViewer);
 	}
 
 	@Override

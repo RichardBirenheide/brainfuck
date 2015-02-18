@@ -622,5 +622,12 @@
             class="org.birenheide.bf.debug.ui.InstructionPointerAnnotationHover">
       </annotationHoverClass>
    </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="org.birenheide.bf.ed.BfDocSetupParticipant"
+            contentTypeId="org.birenheide.bf.brainfuck">
+      </participant>
+   </extension>
 
 </plugin>

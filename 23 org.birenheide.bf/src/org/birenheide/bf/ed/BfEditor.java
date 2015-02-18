@@ -26,8 +26,6 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IDocumentListener;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.source.DefaultCharacterPairMatcher;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -85,11 +83,6 @@ public class BfEditor extends TextEditor {
 			throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, e.getMessage(), e));
 		}
 		document.addDocumentListener(validator);
-		
-		IDocumentPartitioner partitioner = new FastPartitioner(new BfPartitionScanner(), BfPartitionScanner.BRAINFUCK_PARTITION_TYPES);
-		partitioner.connect(document);
-		document.setDocumentPartitioner(partitioner);
-//		document.addDocumentListener(bracketCloser);
 	}
 
 	
