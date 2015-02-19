@@ -13,12 +13,10 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.DocumentCommand;
-import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
@@ -28,26 +26,20 @@ import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
@@ -68,23 +60,19 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		PresentationReconciler reconciler = new PresentationReconciler();
 		reconciler.setDocumentPartitioning(this.getConfiguredDocumentPartitioning(sourceViewer));
 		
-		DefaultDamagerRepairer dr = new WholeDamagerRepairer(new BfCodeScanner(this.fPreferenceStore));
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(new BfCodeScanner(this.fPreferenceStore));
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		
-		dr = new WholeDamagerRepairer(new BfCodeScanner(fPreferenceStore));
+		dr = new DefaultDamagerRepairer(new BfCodeScanner(fPreferenceStore));
 		reconciler.setDamager(dr, BfPartitionScanner.BRAINFUCK_CODE);
 		reconciler.setRepairer(dr, BfPartitionScanner.BRAINFUCK_CODE);
-
-		dr = new DefaultDamagerRepairer(new BfCodeScanner(fPreferenceStore));
-		reconciler.setDamager(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
-		reconciler.setRepairer(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
 		
-		dr = new WholeDamagerRepairer(new BfCommentScanner());
+		dr = new DefaultDamagerRepairer(new SingleColorScanner(fPreferenceStore, BfEditor.EDITOR_COMMENT_CHAR_COLOR_PREF));
 		reconciler.setDamager(dr, BfPartitionScanner.MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, BfPartitionScanner.MULTILINE_COMMENT);
 		
-		dr = new WholeDamagerRepairer(new BfTemplateParametersScanner());
+		dr = new DefaultDamagerRepairer(new SingleColorScanner(fPreferenceStore, BfEditor.EDITOR_TEMPLATE_PARAMS_COLOR_PREF));
 		reconciler.setDamager(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
 		reconciler.setRepairer(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
 		
@@ -165,7 +153,7 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 			ISourceViewer sourceViewer) {
 		return new InformationPresenter(getInformationControlCreator(sourceViewer));
 	}
-
+	
 	/**
 	 * @author Richard Birenheide
 	 *
@@ -271,47 +259,6 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		@Override
 		public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
 			return new Region(offset, 1);
-		}
-	}
-	
-	/**
-	 * @author Richard Birenheide
-	 *
-	 */
-	private static class WholeDamagerRepairer extends DefaultDamagerRepairer {
-
-		public WholeDamagerRepairer(ITokenScanner scanner) {
-			super(scanner);
-		}
-
-		@Override
-		public IRegion getDamageRegion(ITypedRegion partition, DocumentEvent e,
-				boolean documentPartitioningChanged) {
-			return partition;
-		}
-	}
-	
-	/**
-	 * @author Richard Birenheide
-	 *
-	 */
-	private class BfCommentScanner extends BufferedRuleBasedScanner {
-
-		public BfCommentScanner() {
-			Color color = EditorsUI.getSharedTextColors().getColor(PreferenceConverter.getColor(fPreferenceStore, BfEditor.EDITOR_COMMENT_CHAR_COLOR_PREF));
-			this.setDefaultReturnToken(new Token(new TextAttribute(color)));
-		}
-	}
-	
-	/**
-	 * @author Richard Birenheide
-	 *
-	 */
-	private class BfTemplateParametersScanner extends BufferedRuleBasedScanner {
-
-		public BfTemplateParametersScanner() {
-			Color color = EditorsUI.getSharedTextColors().getColor(PreferenceConverter.getColor(fPreferenceStore, BfEditor.EDITOR_TEMPLATE_PARAMS_COLOR_PREF)); 
-			this.setDefaultReturnToken(new Token(new TextAttribute(color)));
 		}
 	}
 }

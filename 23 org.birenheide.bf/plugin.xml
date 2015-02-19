@@ -486,15 +486,15 @@
       </page>
       <page
             category="org.birenheide.bf.MainPage"
-            class="org.birenheide.bf.ui.BfTemplatePreferencePage"
-            id="org.birenheide.bf.Templates"
-            name="Templates">
+            class="org.birenheide.bf.ed.BfEditorPreferencePage"
+            id="org.birenheide.bf.Editor"
+            name="Editor">
       </page>
       <page
             category="org.birenheide.bf.MainPage"
-            class="org.birenheide.bf.ui.BfEditorPreferencePage"
-            id="org.birenheide.bf.Editor"
-            name="Editor">
+            class="org.birenheide.bf.ui.BfTemplatePreferencePage"
+            id="org.birenheide.bf.Templates"
+            name="Templates">
       </page>
       <page
             category="org.birenheide.bf.MainPage"

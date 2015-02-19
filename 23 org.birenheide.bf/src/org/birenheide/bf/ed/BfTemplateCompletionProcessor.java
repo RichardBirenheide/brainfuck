@@ -1,6 +1,8 @@
 package org.birenheide.bf.ed;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.birenheide.bf.BfActivator;
@@ -94,6 +96,13 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 	}
 	
 	private List<String> parseParameters(String prefix) {
-		return Arrays.asList(prefix.split(";"));
+		List<String> parameters = new ArrayList<>(Arrays.asList(prefix.split(";")));
+		for (Iterator<String> i = parameters.iterator(); i.hasNext();) {
+			String param = i.next();
+			if ("".equals(param.trim())) {
+				i.remove();
+			}
+		}
+		return parameters;
 	}
 }

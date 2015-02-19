@@ -8,7 +8,6 @@ import java.util.Deque;
 import java.util.List;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.ui.BfEditorPreferencePage;
 import org.birenheide.bf.ui.BfTemplatePreferencePage;
 import org.birenheide.bf.ui.HelpContext;
 import org.eclipse.core.resources.IFile;
@@ -24,9 +23,9 @@ import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.source.DefaultCharacterPairMatcher;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.dialogs.PreferencesUtil;
@@ -37,15 +36,19 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
 public class BfEditor extends TextEditor {
 
-	public final static String EDITOR_MATCHING_BRACKETS_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBrackets";
-	public final static String EDITOR_MATCHING_BRACKETS_COLOR_PREF= BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBracketsColor";
-	public final static String EDITOR_CLOSE_BRACKET= BfActivator.BUNDLE_SYMBOLIC_NAME + ".closeBracket";
-	public final static String EDITOR_KEY_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".keyCharColor";
-	public final static String EDITOR_OTHER_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".otherCharColor";
-	public final static String EDITOR_COMMENT_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".commentCharColor";
-	public final static String EDITOR_TEMPLATE_PARAMS_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".templateParamsColor";
+	public static final String EDITOR_MATCHING_BRACKETS_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBrackets";
+	public static final String EDITOR_MATCHING_BRACKETS_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBracketsColor";
+	public static final String EDITOR_MATCHING_BRACKETS_SHOW_CARET = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBracketsShowCaretLocation";
+	public static final String EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBracketsShowEnclosedBrackets";
 	
-	public final static String EDITOR_ID = "org.birenheide.bf.BrainfuckEditor";
+	public static final String EDITOR_CLOSE_BRACKET= BfActivator.BUNDLE_SYMBOLIC_NAME + ".closeBracket";
+	
+	public static final String EDITOR_KEY_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".keyCharColor";
+	public static final String EDITOR_OTHER_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".otherCharColor";
+	public static final String EDITOR_COMMENT_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".commentCharColor";
+	public static final String EDITOR_TEMPLATE_PARAMS_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".templateParamsColor";
+	
+	public static final String EDITOR_ID = "org.birenheide.bf.BrainfuckEditor";
 	
 	/**
 	 * File extension for Brainfuck files: {@value}.
@@ -53,7 +56,6 @@ public class BfEditor extends TextEditor {
 	public static final String BF_FILE_EXTENSION = "bf";
 	
 	private BfContentValidator validator = new BfContentValidator();
-//	private BracketCloser bracketCloser = new BracketCloser();
 	
 	@Override
 	protected void initializeEditor() {
@@ -66,9 +68,17 @@ public class BfEditor extends TextEditor {
 	protected void configureSourceViewerDecorationSupport(SourceViewerDecorationSupport support) {
 		super.configureSourceViewerDecorationSupport(support);
 		
-		DefaultCharacterPairMatcher matcher = new DefaultCharacterPairMatcher(new char[]{'[', ']'}, IDocumentExtension3.DEFAULT_PARTITIONING, true);
+		DefaultCharacterPairMatcher matcher = 
+				new DefaultCharacterPairMatcher(
+						new char[]{'[', ']'}, 
+						BfDocSetupParticipant.BF_PARTITIONING, 
+						true);
 		support.setCharacterPairMatcher(matcher);
-		support.setMatchingCharacterPainterPreferenceKeys(EDITOR_MATCHING_BRACKETS_PREF, EDITOR_MATCHING_BRACKETS_COLOR_PREF);
+		support.setMatchingCharacterPainterPreferenceKeys(
+				EDITOR_MATCHING_BRACKETS_PREF, 
+				EDITOR_MATCHING_BRACKETS_COLOR_PREF, 
+				EDITOR_MATCHING_BRACKETS_SHOW_CARET, 
+				EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING);
 	}
 
 	@Override
@@ -82,7 +92,8 @@ public class BfEditor extends TextEditor {
 			this.validator.validate(document);
 		} 
 		catch (BadLocationException e) {
-			throw new CoreException(new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, e.getMessage(), e));
+			throw new CoreException(
+					new Status(IStatus.ERROR, BfActivator.BUNDLE_SYMBOLIC_NAME, e.getMessage(), e));
 		}
 		document.addDocumentListener(validator);
 	}
@@ -97,6 +108,23 @@ public class BfEditor extends TextEditor {
 		this.setAction(ITextEditorActionConstants.RULER_PREFERENCES, new OpenBfEditorPreferenceDialog());
 		this.setAction(ITextEditorActionConstants.CONTEXT_PREFERENCES, new OpenBfEditorPreferenceDialog());
 	}
+
+
+	
+	@Override
+	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
+		String property = event.getProperty();
+		if (EDITOR_KEY_CHAR_COLOR_PREF.equals(property) || 
+				EDITOR_COMMENT_CHAR_COLOR_PREF.equals(property) ||
+				EDITOR_TEMPLATE_PARAMS_COLOR_PREF.equals(property) ||
+				EDITOR_OTHER_CHAR_COLOR_PREF.equals(property)) {
+			if (this.getSourceViewer() != null) {
+				this.getSourceViewer().invalidateTextPresentation();
+			}
+		}
+		super.handlePreferenceStoreChanged(event);
+	}
+
 
 
 	/**
@@ -185,7 +213,6 @@ public class BfEditor extends TextEditor {
 			final IFile resource = ((IFileEditorInput) getEditorInput()).getFile();
 			
 			WorkspaceJob wsj = new WorkspaceJob("Validate") {
-				
 				@Override
 				public IStatus runInWorkspace(IProgressMonitor monitor)
 						throws CoreException {

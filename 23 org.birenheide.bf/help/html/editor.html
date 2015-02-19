@@ -4,9 +4,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" charset="ISO-8859-1" type="text/css">
-	<style type="text/css">
-	code.key { color:#A000A0; font-weight:bold; }
-	</style>
+	<link rel="stylesheet" href="./pref.css" charset="UTF-8" type="text/css">
+
 	<title>Editor</title>
 </head>
 
@@ -15,16 +14,37 @@
 The Brainfuck Editor enhances the standard text editor with a few functions. 
 <ul>
 <li><b>Syntax Highlighting</b><br>
-	The Brainfuck key characters <code class="key">+ - &lt; &gt; . , [ ]</code> are colored. All other characters are
-	ignored and assumed to be comments being colored differently.
+	<ul type="disc">
+	<li>The Brainfuck key characters <code class="key">+ - &lt; &gt; . , [ ]</code>.</li> 
+	<li>A sequence of numbers (exclamation mark for negative values) separated by a semicolon are
+	recognized as input parameters for a template.</li>
+	<li>The special sequence <code class="comment">[-][]</code> will not be executed by Brainfuck
+		within the second pair of bracket and thus being marked as comment. This construct is safe
+		as long as all brackets are balanced but will delete the contents at the actual memory location.</li> 
+	<li>All other characters are ignored and assumed to be inline comments.</li>
+	</ul>
 </li>
 <li><b>Typing</b><br>
-	Typing an opening bracket <code class="key">[</code> can be completed automatically by a corresponding closing bracket <code class="key">]</code>.<br>
+	Typing an opening bracket <code class="key">[</code> can be completed 
+	automatically by a corresponding closing bracket <code class="key">]</code>.<br>
 	Indentation is automatically propagated to the next line.  
 </li>
 <li><b>Content Assist</b><br>
-	Content assist can be triggered any time (Default is CTRL-SPACE). This will show the applicable templates. Content assist can then be toggled to display the key characters.<br>
-	Note that some of the templates operate on non-Brainfuck characters preceding the trigger location as customized input to the template.  
+	Content assist can be triggered any time (Default is CTRL-SPACE) within code. 
+	This will show the applicable templates. Content assist can then 
+	be toggled to display the key characters.<br>
+	Some of the templates operate on non-Brainfuck characters 
+	preceding the trigger location as customized input to the template.
+	Valid input parameters will be colored separately and the templates are
+	sorted according to their presumed acceptance of number of parameters
+	matching the number of parameters at the trigger location.
+	<p>
+	Example:<br>
+	<code>3;2</code> will evaluate to two parameters <code>3</code> and
+	<code>2</code> respectively. Templates which take two parameters will then
+	show up on top of the completion proposals, then templates taking no parameter
+	followed by the templates taking less than two parameters followed by the rest.
+	</p> 
 </li>
 <li><b>Error Checking</b><br>
 	Code is automatically checked for matching brackets.
