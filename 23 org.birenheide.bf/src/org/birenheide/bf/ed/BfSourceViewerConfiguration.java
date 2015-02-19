@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -46,8 +47,7 @@ import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
@@ -77,12 +77,16 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		reconciler.setRepairer(dr, BfPartitionScanner.BRAINFUCK_CODE);
 
 		dr = new DefaultDamagerRepairer(new BfCodeScanner(fPreferenceStore));
-		reconciler.setDamager(dr, BfPartitionScanner.NON_BRAINFUCK_CHARS);
-		reconciler.setRepairer(dr, BfPartitionScanner.NON_BRAINFUCK_CHARS);
+		reconciler.setDamager(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
+		reconciler.setRepairer(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
 		
 		dr = new WholeDamagerRepairer(new BfCommentScanner());
 		reconciler.setDamager(dr, BfPartitionScanner.MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, BfPartitionScanner.MULTILINE_COMMENT);
+		
+		dr = new WholeDamagerRepairer(new BfTemplateParametersScanner());
+		reconciler.setDamager(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
+		reconciler.setRepairer(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
 		
 		return reconciler;
 	}
@@ -109,13 +113,12 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 				IDocument.DEFAULT_CONTENT_TYPE, 
 				BfPartitionScanner.BRAINFUCK_CODE, 
 				BfPartitionScanner.MULTILINE_COMMENT, 
-				BfPartitionScanner.NON_BRAINFUCK_CHARS};
+				BfPartitionScanner.TEMPLATE_PARAMETERS};
 	}
 
 	@Override
 	public String getConfiguredDocumentPartitioning(ISourceViewer sourceViewer) {
 		return  BfDocSetupParticipant.BF_PARTITIONING;
-//		return super.getConfiguredDocumentPartitioning(sourceViewer);
 	}
 
 	@Override
@@ -292,10 +295,23 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	 * @author Richard Birenheide
 	 *
 	 */
-	private static class BfCommentScanner extends BufferedRuleBasedScanner {
+	private class BfCommentScanner extends BufferedRuleBasedScanner {
 
 		public BfCommentScanner() {
-			this.setDefaultReturnToken(new Token(new TextAttribute(Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN))));
+			Color color = EditorsUI.getSharedTextColors().getColor(PreferenceConverter.getColor(fPreferenceStore, BfEditor.EDITOR_COMMENT_CHAR_COLOR_PREF));
+			this.setDefaultReturnToken(new Token(new TextAttribute(color)));
+		}
+	}
+	
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
+	private class BfTemplateParametersScanner extends BufferedRuleBasedScanner {
+
+		public BfTemplateParametersScanner() {
+			Color color = EditorsUI.getSharedTextColors().getColor(PreferenceConverter.getColor(fPreferenceStore, BfEditor.EDITOR_TEMPLATE_PARAMS_COLOR_PREF)); 
+			this.setDefaultReturnToken(new Token(new TextAttribute(color)));
 		}
 	}
 }

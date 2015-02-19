@@ -106,7 +106,13 @@ Color of all non-key characters of Brainfuck.
           
         </li>
       </ul>
-      
+      <h3><a name="parameters">Parameters obtained from the template trigger location</a></h3>
+    <p>
+    Templates can pick up parameters from the source code. When a template is triggered from the source code
+    the preceding characters are parsed and split along semicolons. The resulting values can be referenced in
+    templates by <code>x0,x1,...,xn</code>. These variables are automatically mixed into the template context.
+    Numerical values must be preceded by <code>!</code> (exclamation mark) to designate negative values. 
+    </p>  
     <h3><a name="template_vars">Template Variables</a></h3>
     <p>Brainfuck context defines the following variables.
     	<b>Note:</b> In the table below, <i>id</i> is a user-chosen name of a new variable.</p>
@@ -131,15 +137,35 @@ Color of all non-key characters of Brainfuck.
           <td><strong>${dollar}</strong></td>
           <td>Evaluates to the dollar symbol <code>$</code>. Alternatively, two dollars can be used: <code>$$</code>.</td>
         </tr>
+      	<tr>
+          <td><strong>${<i>id</i>:eval(<i>n</i>)}</strong> or <br>
+          	<strong>${<i>id</i>:eval(<i>n, operation, k</i>)}</td>
+          <td>Either stores the value of <code>n</code> in variable <code>id</code> or stores the value of the operation
+          	  between <code>n</code> and <code>k</code> in <code>id</code>.
+          	  <p>
+				<strong>${eval}</strong> allows for the following operations:
+				<ul>
+				<li><strong>+</strong> for adding the first and the third argument</li>
+				<li><strong>plus</strong> for adding the first and the third argument</li>
+				<li><strong>-</strong> for subtracting the third from the first argument</li>
+				<li><strong>minus</strong> for subtracting the third from the first argument</li>
+				</ul>
+			</p>
+              <p>Example:<br>
+              <code>${first:eval(<a href="#parameters">x0</a>, '-', <a href="#parameters">x1</a>)}</code> sets the value of <code>first</code> to <code>2</code> if the template is triggered on <code>6;4</code> in the code.
+            </p>
+          
+          </td>
+        </tr>        
         <tr>
           <td><strong>${<i>id</i>:inc_dec(<i>n</i>)}</strong> or <br>
               <strong>${<i>id</i>:inc_dec(<i>n, operation, k</i>)}</strong></td>
           <td>Evaluates to <i>n</i> increments or decrements. Positive values will increment, negative values will decrement.
               Negative values can be preceded with the exclamation mark to avoid conflicts with the minus sign which is a Brainfuck key character.
-              <i>n</i> can also be a reference of a variable defined by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+              <i>n</i> can also be a reference of a parameter variable.
               <p>Example:<br>
               <code>${dec_three:inc_dec('-3')}</code> evaluates to <code>---</code><br>
-              <code>${x:parse(1)}${a:inc_dec(x)}</code> evaluates to <code>---</code> if the template is triggered after <code>1;!3</code> in the code.
+              <code>${a:inc_dec(<a href="#parameters">x1</a>)}</code> evaluates to <code>---</code> if the template is triggered after <code>1;!3</code> in the code.
             </p>
 			<p>
 				<strong>${inc_dec}</strong> takes three arguments as well to allow calculations on positions. <strong><i>operation</i></strong> may take the following values:
@@ -149,11 +175,11 @@ Color of all non-key characters of Brainfuck.
 				<li><strong>-</strong> for subtracting the third from the first argument</li>
 				<li><strong>minus</strong> for subtracting the third from the first argument</li>
 				</ul>
-				This allows easy calculation of relative increments/decrements to a fixed argument obtained by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+				This allows easy calculation of relative increments/decrements to a fixed argument obtained via parameter variables.
 			</p>
 			<p>
 				Example:<br>
-				<code>${x:parse(0)}${y:parse(1)}${a:inc_dec(x,'-',y)}</code> evaluates to <code>---</code> if the template is triggered after <code>4;7</code> in the code.<br>
+				<code>${a:inc_dec(<a href="#parameters">x0</a>,'-',<a href="#parameters">x1</a>)}</code> evaluates to <code>---</code> if the template is triggered after <code>4;7</code> in the code.<br>
 			</p>          
           </td>
         </tr>
@@ -162,10 +188,10 @@ Color of all non-key characters of Brainfuck.
               <strong>${<i>id</i>:mem_shift(<i>n, operation, k</i>)}</strong></td>
           <td>Evaluates to <i>n</i> shifts of the memory pointer. Positive values will shift to right, negative values will shift to left.
               Negative values can be preceded with the exclamation mark to avoid conflicts with the minus sign which is a Brainfuck key character.
-              <i>n</i> can also be a reference of a variable defined by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+              <i>n</i> can also be a reference of a parameter variable.
               <p>Example:<br>
               <code>${shift_three:mem_shift('-3')}</code> evaluates to <code>&lt;&lt;&lt;</code><br>
-              <code>${x:parse(1)}${a:mem_shift(x)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>1;!3</code> in the code.
+              <code>${a:mem_shift(<a href="#parameters">x1</a>)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>1;!3</code> in the code.
             </p>
 			<p>
 				<strong>${mem_shift}</strong> takes three arguments as well to allow calculations on positions. <strong><i>operation</i></strong> may take the following values:
@@ -175,25 +201,13 @@ Color of all non-key characters of Brainfuck.
 				<li><strong>-</strong> for subtracting the third from the first argument</li>
 				<li><strong>minus</strong> for subtracting the third from the first argument</li>
 				</ul>
-				This allows easy calculation of relative shifts to a fixed argument obtained by <strong>${<i>id</i>:parse(<i>n</i>)}</strong>.
+				This allows easy calculation of relative shifts to a fixed argument obtained via parameter variables.
 			</p>
 			<p>
 				Example:<br>
-				<code>${x:parse(0)}${y:parse(1)}${a:mem_shift(x,'-',y)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>4;7</code> in the code.<br>
+				<code>${a:mem_shift(<a href="#parameters">x0</a>,'-',<a href="#parameters">x1</a>)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>4;7</code> in the code.<br>
 				A more elaborate example can be found in the built-in template <strong><i>copy</i></copy>.
 			</p>          
-          </td>
-        </tr>
-        <tr>
-          <td><strong>${<i>id</i>:parse(<i>n</i>)}</strong></td>
-          <td>Parses any non-Brainfuck characters to the left of the completion trigger in the source code. The characters are split around semicolon
-              and the <i>n</i>-th (zero-based) value will set to a variable named <i>id</i>. The expression itself will evaluate to an empty string but
-              can be refered to in arguments to other variables. It is advisable to parse "arguments" first in a template and to refer to these
-              in subsequent variable expressions.
-              <p>Example:<br>
-              <code>${first:parse(0)}</code> sets the value of <code>first</code> to <code>some</code> if the template is triggered on <code>some;thing</code> in the code.
-            </p>
-          
           </td>
         </tr>
         <tr>
@@ -221,6 +235,11 @@ Color of all non-key characters of Brainfuck.
           <td><strong>${word_selection}</strong></td>
           <td>Evaluates to the content of the current text selection.</td>
         </tr>
+        <tr>
+          <td><strong><a href="#parameters">x0</a></strong> to <strong><a href="#parameters">x&lt;<i>n</i>&gt;</a></strong></td>
+          <td>Predefined variables which can be referenced as parameters. They contain the value of the <i>n</i>-th parameter provided on triggering the template.</td>
+        </tr>
+        
         <tr>
           <td><strong>${year}</strong></td>
           <td>Evaluates to the current year.</td>

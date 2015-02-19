@@ -26,6 +26,8 @@ public class BfPreferenceInitializer extends AbstractPreferenceInitializer {
 		PreferenceConverter.setDefault(editorStore, BfEditor.EDITOR_MATCHING_BRACKETS_COLOR_PREF, getSystemColorRGB(SWT.COLOR_DARK_GRAY));
 		PreferenceConverter.setDefault(editorStore, BfEditor.EDITOR_KEY_CHAR_COLOR_PREF, getSystemColorRGB(SWT.COLOR_DARK_MAGENTA));
 		PreferenceConverter.setDefault(editorStore, BfEditor.EDITOR_OTHER_CHAR_COLOR_PREF, getSystemColorRGB(SWT.COLOR_DARK_GRAY));
+		PreferenceConverter.setDefault(editorStore, BfEditor.EDITOR_COMMENT_CHAR_COLOR_PREF, getSystemColorRGB(SWT.COLOR_DARK_GREEN));
+		PreferenceConverter.setDefault(editorStore, BfEditor.EDITOR_TEMPLATE_PARAMS_COLOR_PREF, getSystemColorRGB(SWT.COLOR_BLUE));
 		editorStore.setDefault(BfEditor.EDITOR_MATCHING_BRACKETS_PREF, true);
 		editorStore.setDefault(BfEditor.EDITOR_CLOSE_BRACKET, true);
 	}

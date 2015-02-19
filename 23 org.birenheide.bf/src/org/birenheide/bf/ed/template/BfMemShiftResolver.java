@@ -11,9 +11,7 @@ import org.eclipse.jface.text.templates.TemplateVariable;
  * The parameters passed must be integers. Negative integers mean left shift,
  * positive integers mean right shift. To allow parsing input from source files
  * in which minus signs are key characters, a negative number might be prefixed
- * with an exclamation mark instead of a minus sign. This should be used in conjunction
- * with {@link BfParameterResolver}.
- * @see BfParameterResolver
+ * with an exclamation mark instead of a minus sign.
  * @author Richard Birenheide
  *
  */

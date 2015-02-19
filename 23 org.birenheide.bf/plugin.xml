@@ -456,16 +456,16 @@
             type="inc_dec">
       </resolver>
       <resolver
-            class="org.birenheide.bf.ed.template.BfParameterResolver"
-            contextTypeId="org.birenheide.bf.brainfuck"
-            description="Parses non Brainfuck characters. Separator is &apos;;&apos;. Parametrize with the index. Example ${param0:parse(0)}. This will set the variable &apos;param0&apos; to &apos;a&apos; if the completion is triggered on &apos;a;b;c&apos;. The variable returns nothing but can be refered to in other variables."
-            type="parse">
-      </resolver>
-      <resolver
             class="org.birenheide.bf.ed.template.BfKeyResolver"
             contextTypeId="org.birenheide.bf.brainfuck"
             description="Evaluates to the text on which the template proposal was triggered"
             type="trigger_key">
+      </resolver>
+      <resolver
+            class="org.birenheide.bf.ed.template.EvalResolver"
+            contextTypeId="org.birenheide.bf.brainfuck"
+            description="Evaluates an expression. Returns empty String, used to define intermediate variables used as parameters"
+            type="eval">
       </resolver>
       <include
             file="templates/default.xml">

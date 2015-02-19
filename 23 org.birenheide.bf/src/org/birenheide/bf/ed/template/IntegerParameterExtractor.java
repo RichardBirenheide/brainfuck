@@ -6,7 +6,7 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
 
 
-public class IntegerParameterExtractor extends TemplateVariableResolver {
+public abstract class IntegerParameterExtractor extends TemplateVariableResolver {
 
 	public IntegerParameterExtractor() {
 		super();

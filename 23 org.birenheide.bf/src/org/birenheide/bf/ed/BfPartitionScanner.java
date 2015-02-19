@@ -11,34 +11,33 @@ import org.eclipse.jface.text.rules.Token;
 public class BfPartitionScanner extends RuleBasedPartitionScanner {
 	
 	public static final String BRAINFUCK_CODE = "__brainfuck_code";
-	public static final String NON_BRAINFUCK_CHARS = "__non__brainfuck";
+	public static final String TEMPLATE_PARAMETERS = "__template_parameters";
 	public static final String MULTILINE_COMMENT = "__brainfuck_multiline_comment";
 	
 	public static final String[] BRAINFUCK_PARTITION_TYPES = 
 			new String[] {
 				BRAINFUCK_CODE, 
-				NON_BRAINFUCK_CHARS, 
+				TEMPLATE_PARAMETERS, 
 				MULTILINE_COMMENT
 				};
 	
 
 	public BfPartitionScanner() {
 		super();
-//		IToken bfCode = new Token(BRAINFUCK_CODE);
-//		IToken nonBfCHars = new Token(NON_BRAINFUCK_CHARS);
-		IToken comment = new Token(MULTILINE_COMMENT);
-		
 		IPredicateRule bfCodeRule = new BfCodeRule();
-		IPredicateRule nonBfCharRule = new NonBfCharRule();
 		/*
 		 * MUST break on EOF, otherwise reparsing breaks when closing the comment section after being incomplete
 		 */
-//		IPredicateRule multiLineCommentRule = new MultiLineRule("[-][", "]", comment, (char) 0, true);
 		IPredicateRule multiLineCommentRule = new CommentRule();
+		IPredicateRule templateParametersRule = new TemplateParametersRule();
 		
-		this.setPredicateRules(new IPredicateRule[]{multiLineCommentRule, bfCodeRule});
+		this.setPredicateRules(new IPredicateRule[]{multiLineCommentRule, bfCodeRule, templateParametersRule});
 	}
 	
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
 	private static class BfCodeRule implements IPredicateRule {
 
 		private static final String END_TOKEN = "[-][";
@@ -54,13 +53,6 @@ public class BfPartitionScanner extends RuleBasedPartitionScanner {
 			char value = (char) val;
 			if (BrainfuckInterpreter.isReservedChar(value)) {
 				return this.readToEnd(scanner, value);
-//				do {
-//					val = scanner.read();
-//					value = (char) val;
-//				}
-//				while (BrainfuckInterpreter.isReservedChar(value) && val != ICharacterScanner.EOF);
-//				scanner.unread();
-//				return this.successToken;
 			}
 			else {
 				scanner.unread();
@@ -110,6 +102,10 @@ public class BfPartitionScanner extends RuleBasedPartitionScanner {
 		}
 	}
 	
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
 	private static class CommentRule extends MultiLineRule {
 		CommentRule() {
 			super("[-][", "]", new Token(MULTILINE_COMMENT), (char) 0, true);
@@ -136,68 +132,45 @@ public class BfPartitionScanner extends RuleBasedPartitionScanner {
 			
 			return true;
 		}
-		
-		
 	}
 	
-	private static class NonBfCharRule implements IPredicateRule {
-
-		private final IToken successToken = new Token(NON_BRAINFUCK_CHARS);
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
+	private static class TemplateParametersRule implements IPredicateRule {
 		
+		private final IToken successToken = new Token(TEMPLATE_PARAMETERS);
+
+		@Override
+		public IToken evaluate(ICharacterScanner scanner) {
+			return this.evaluate(scanner, false);
+		}
+
+		@Override
+		public IToken getSuccessToken() {
+			return this.successToken;
+		}
+
 		@Override
 		public IToken evaluate(ICharacterScanner scanner, boolean resume) {
+			boolean successfullyConsumed = false;
 			int val = scanner.read();
 			if (val == ICharacterScanner.EOF) {
 				return Token.EOF;
 			}
 			char value = (char) val;
-			if (!BrainfuckInterpreter.isReservedChar(value)) {
-				do {
-					val = scanner.read();
-					value = (char) val;
-				}
-				while (!BrainfuckInterpreter.isReservedChar(value) && val != ICharacterScanner.EOF);
-				scanner.unread();
+			while (Character.isDigit(value) || value == ';' || value == '!') {
+				successfullyConsumed = true;
+				value = (char) scanner.read();
+			}
+			scanner.unread();
+			if (successfullyConsumed) {
 				return this.successToken;
 			}
 			else {
-				scanner.unread();
 				return Token.UNDEFINED;
 			}
 		}
-
-		@Override
-		public IToken evaluate(ICharacterScanner scanner) {
-			return this.evaluate(scanner, false);
-		}
-
-		@Override
-		public IToken getSuccessToken() {
-			return this.successToken;
-		}
 	}
-	
-	private static class MultiLineCommentRule implements IPredicateRule {
-		
-		private final IToken successToken = new Token(MULTILINE_COMMENT);
-
-		@Override
-		public IToken evaluate(ICharacterScanner scanner) {
-			return this.evaluate(scanner, false);
-		}
-
-		@Override
-		public IToken getSuccessToken() {
-			return this.successToken;
-		}
-
-		@Override
-		public IToken evaluate(ICharacterScanner scanner, boolean resume) {
-			System.out.println(resume);
-			
-			return null;
-		}
-		
-	}
-
 }

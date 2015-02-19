@@ -1,13 +1,17 @@
 package org.birenheide.bf.ed;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.BrainfuckInterpreter;
 import org.birenheide.bf.ed.template.BfTemplateType;
 import org.birenheide.bf.ui.BfImages;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.BadPartitioningException;
+import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContext;
@@ -35,38 +39,61 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 	@Override
 	protected String extractPrefix(ITextViewer viewer, int offset) {
 		try {
-			IDocument document = viewer.getDocument();
-			int keyWordStart = offset - 1;
-			while (keyWordStart >= 0) {
-				char c = document.getChar(keyWordStart);
-				if (BrainfuckInterpreter.isReservedChar(c) || Character.isWhitespace(c)) {
-					break;
-				}
-				else {
-					keyWordStart--;
-				}
+			if (offset == 0) {
+				return "";
 			}
-			keyWordStart++;
-			String keyword = document.get(keyWordStart, offset - keyWordStart).trim();
-			return keyword;
+			if (!(viewer.getDocument() instanceof IDocumentExtension3)) {
+				return super.extractPrefix(viewer, offset);
+			}
+			IDocumentExtension3 document3 = (IDocumentExtension3) viewer.getDocument();
+			ITypedRegion previousRegion = document3.getPartition(BfDocSetupParticipant.BF_PARTITIONING, offset - 1, false);
+			if (BfPartitionScanner.TEMPLATE_PARAMETERS.equals(previousRegion.getType())) {
+				return viewer.getDocument().get(previousRegion.getOffset(), previousRegion.getLength());
+			}
 		} 
-		catch (BadLocationException e) {
-			BfActivator.getDefault().logError("Prefix for Template could not be computed", e);
+		catch (BadLocationException | BadPartitioningException ex) {
+			BfActivator.getDefault().logError("Prefix for Template could not be computed", ex);
 		}
 		return super.extractPrefix(viewer, offset);
 	}
 
 	@Override
 	protected int getRelevance(Template template, String prefix) {
-		// TODO Auto-generated method stub
-		return super.getRelevance(template, prefix);
+		int parameterCount = this.parseParameters(prefix).size();
+		int templateParameterCount = 0;
+		while (template.getPattern().contains("x" + templateParameterCount)) {
+			templateParameterCount++;
+		}
+		if (parameterCount == templateParameterCount) {
+			return 100;
+		}
+		else if (templateParameterCount == 0) {
+			return 20;
+		}
+		else if (templateParameterCount < parameterCount) {
+			return 10;
+		}
+		return -1;
 	}
 
 	@Override
 	protected TemplateContext createContext(ITextViewer viewer, IRegion region) {
-		// TODO Auto-generated method stub
-		return super.createContext(viewer, region);
+		TemplateContext context = super.createContext(viewer, region);
+		try {
+			String prefix = viewer.getDocument().get(region.getOffset(), region.getLength());
+			int i = 0;
+			for (String param : this.parseParameters(prefix)) {
+				context.setVariable("x" + (i++), param);
+			}
+		} 
+		catch (BadLocationException ex) {
+			BfActivator.getDefault().logError("Prefix for Template could not be computed", ex);
+		}
+		
+		return context;
 	}
 	
-	
+	private List<String> parseParameters(String prefix) {
+		return Arrays.asList(prefix.split(";"));
+	}
 }

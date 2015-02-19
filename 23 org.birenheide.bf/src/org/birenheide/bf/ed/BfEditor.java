@@ -42,6 +42,8 @@ public class BfEditor extends TextEditor {
 	public final static String EDITOR_CLOSE_BRACKET= BfActivator.BUNDLE_SYMBOLIC_NAME + ".closeBracket";
 	public final static String EDITOR_KEY_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".keyCharColor";
 	public final static String EDITOR_OTHER_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".otherCharColor";
+	public final static String EDITOR_COMMENT_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".commentCharColor";
+	public final static String EDITOR_TEMPLATE_PARAMS_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".templateParamsColor";
 	
 	public final static String EDITOR_ID = "org.birenheide.bf.BrainfuckEditor";
 	

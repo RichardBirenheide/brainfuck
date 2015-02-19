@@ -1,9 +1,14 @@
 package org.birenheide.bf.ed.template;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+import org.birenheide.bf.BfActivator;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.text.templates.TemplateVariable;
+import org.eclipse.jface.text.templates.TemplateVariableResolver;
 
 public class BfTemplateType extends TemplateContextType {
 	
@@ -26,15 +31,10 @@ public class BfTemplateType extends TemplateContextType {
 
 	@Override
 	public void resolve(TemplateVariable variable, TemplateContext context) {
-//		System.out.println(variable.getType() + variable.getName() + variable.getVariableType());
-		
 		super.resolve(variable, context);
 	}
 	
-	
-	
 	private void addResolvers() {
-//		this.addResolver(new BfSelectedTextParser());
 		addResolver(new GlobalTemplateVariables.Cursor());
 		addResolver(new GlobalTemplateVariables.WordSelection());
 		addResolver(new GlobalTemplateVariables.LineSelection());
@@ -43,6 +43,16 @@ public class BfTemplateType extends TemplateContextType {
 		addResolver(new GlobalTemplateVariables.Year());
 		addResolver(new GlobalTemplateVariables.Time());
 		addResolver(new GlobalTemplateVariables.User());
+		
+		for (Field f : BfNamedParameterResolver.class.getFields()) {
+			if (Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers()) && f.getType().equals(TemplateVariableResolver.class)) {
+				try {
+					addResolver((TemplateVariableResolver)f.get(null));
+				} 
+				catch (IllegalArgumentException | IllegalAccessException | ClassCastException ex) {
+					BfActivator.getDefault().logError("Template Variables could not be resolved", ex);
+				}
+			}
+		}
 	}
-
 }
