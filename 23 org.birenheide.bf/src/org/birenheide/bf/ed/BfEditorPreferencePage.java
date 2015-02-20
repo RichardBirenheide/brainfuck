@@ -40,6 +40,9 @@ public class BfEditorPreferencePage extends PreferencePage implements
 			+ "<a href=\"org.eclipse.ui.editors.preferencePages.Annotations#Brainfuck Instruction Pointer\">instruction</a> "
 			+ "pointer location being displayed.";
 	private static final String TITLE = "Brainfuck Editor"; 
+	private static final String RESTORE_DEFAULTS_TEXT = "Restore Defaults";
+	private static final String COLOR_LABEL_TEXT = "Color:";
+	
 	public static final String ID = "org.birenheide.bf.Editor";
 	
 	
@@ -118,7 +121,7 @@ public class BfEditorPreferencePage extends PreferencePage implements
 		this.showEnclosingBrackets.setText("Enclosing brackets");
 		
 		Composite colorGroup = new Composite(area, SWT.NONE);
-		colorGroup.setLayoutData(GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).indent(newParagraph).span(2, 1).create());
+		colorGroup.setLayoutData(GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(false, false).indent(newParagraph).span(2, 1).create());
 		colorGroup.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		
 		Label colorOptionsLabel = new Label(colorGroup, SWT.NONE);
@@ -138,10 +141,23 @@ public class BfEditorPreferencePage extends PreferencePage implements
 		
 		Label colorButtonLabel = new Label(colorButtonGroup, SWT.NONE);
 		colorButtonLabel.setLayoutData(GridDataFactory.swtDefaults().create());
-		colorButtonLabel.setText("Color:");
+		colorButtonLabel.setText(COLOR_LABEL_TEXT);
 		
+		int selectorButtonWidth = this.convertWidthInCharsToPixels(RESTORE_DEFAULTS_TEXT.length()) - this.convertWidthInCharsToPixels(COLOR_LABEL_TEXT.length() + 1);
 		this.colorSelector = new ColorSelector(colorButtonGroup);
-		this.colorSelector.getButton().setLayoutData(GridDataFactory.swtDefaults().create());
+		this.colorSelector.getButton().setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).hint(selectorButtonWidth, SWT.DEFAULT).create());
+		
+		Button colorDefaults = new Button(colorButtonGroup, SWT.PUSH);
+		colorDefaults.setLayoutData(GridDataFactory.swtDefaults().span(2, 1).create());
+		colorDefaults.setText(RESTORE_DEFAULTS_TEXT);
+		colorDefaults.setToolTipText("Restore defaults\nfor colors only");
+		colorDefaults.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				initializeColorValues(true);
+				setColorListSelection(-1);
+			}
+		});
 		
 		this.colorPreferenceList.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -237,6 +253,10 @@ public class BfEditorPreferencePage extends PreferencePage implements
 		this.showCaretLocation.setSelection(showCaret && !showEnclosing);
 		this.showEnclosingBrackets.setSelection(showEnclosing && showCaret);
 		
+		this.initializeColorValues(setDefaults);
+	}
+	
+	private void initializeColorValues(boolean setDefaults) {
 		for (ColorPreference pref : this.colorPreferenceStore) {
 			pref.initializeValue(setDefaults);
 		}

@@ -5,16 +5,12 @@ import java.util.List;
 
 import org.birenheide.bf.BrainfuckInterpreter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.ui.editors.text.EditorsUI;
 
 class BfCodeScanner extends BufferedRuleBasedScanner {
 	
@@ -27,12 +23,10 @@ class BfCodeScanner extends BufferedRuleBasedScanner {
 	}
 	
 	
-	private static class BfCodeColorRule implements IRule {
-		
-		private final IPreferenceStore editorPreferenceStore;
+	private static class BfCodeColorRule extends PreferenceColorRule {
 		
 		BfCodeColorRule(IPreferenceStore editorPreferenceStore) {
-			this.editorPreferenceStore = editorPreferenceStore;
+			super(editorPreferenceStore);
 		}
 
 		@Override
@@ -43,20 +37,17 @@ class BfCodeScanner extends BufferedRuleBasedScanner {
 			}
 			char value = (char) val;
 			if (BrainfuckInterpreter.isReservedChar(value)) {
-				Color foreGround = EditorsUI.
-						getSharedTextColors().
-						getColor(PreferenceConverter.getColor(
-								this.editorPreferenceStore, 
-								BfEditor.EDITOR_KEY_CHAR_COLOR_PREF));
-				return new Token(new TextAttribute(foreGround, null, SWT.BOLD));
+				return this.getToken(BfEditor.EDITOR_KEY_CHAR_COLOR_PREF);
 			}
-			Color foreGround = EditorsUI.
-					getSharedTextColors().
-					getColor(PreferenceConverter.getColor(
-							this.editorPreferenceStore, 
-							BfEditor.EDITOR_OTHER_CHAR_COLOR_PREF));
-			return new Token(new TextAttribute(foreGround));
+			return this.getToken(BfEditor.EDITOR_OTHER_CHAR_COLOR_PREF);
 		}
-		
+
+		@Override
+		int getStyle(String foregroundColorKey) {
+			if (foregroundColorKey.equals(BfEditor.EDITOR_KEY_CHAR_COLOR_PREF)) {
+				return SWT.BOLD;
+			}
+			return super.getStyle(foregroundColorKey);
+		}
 	}
 }
