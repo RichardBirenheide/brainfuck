@@ -10,7 +10,8 @@
             default="true"
             icon="icons/brainfuck.gif"
             id="org.birenheide.bf.BrainfuckEditor"
-            name="Brainfuck Editor">
+            name="Brainfuck Editor"
+            symbolicFontName="org.birenheide.bf.EditorFont">
          <contentTypeBinding
                contentTypeId="org.birenheide.bf.brainfuck">
          </contentTypeBinding>
@@ -26,6 +27,19 @@
             name="Brainfuck File"
             priority="normal">
       </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <themeElementCategory
+            id="org.birenheide.bf.editor"
+            label="Brainfuck">
+      </themeElementCategory>
+      <fontDefinition
+            categoryId="org.birenheide.bf.editor"
+            defaultsTo="org.eclipse.jface.textfont"
+            id="org.birenheide.bf.EditorFont"
+            label="Brainfuck Editor Text Font">
+      </fontDefinition>
    </extension>
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
