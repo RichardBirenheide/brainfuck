@@ -1,10 +1,7 @@
 package org.birenheide.bf.ed.template;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.List;
 
-import org.birenheide.bf.BfActivator;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
@@ -16,19 +13,25 @@ public class BfTemplateType extends TemplateContextType {
 	
 	public static final String TYPE_ID = "org.birenheide.bf.brainfuck";
 	public static final String REGISTRY_ID = "org.birenheide.bf.BfEditor";
-
+	
 	public BfTemplateType() {
-		this.addResolvers();
+		this.addResolvers(0);
 	}
 
 	public BfTemplateType(String id) {
 		super(id);
-		this.addResolvers();
+		this.addResolvers(0);
 	}
 
 	public BfTemplateType(String id, String name) {
 		super(id, name);
-		this.addResolvers();
+		this.addResolvers(0);
+	}
+	
+	BfTemplateType(String id, String name, int noOfParameters) {
+		this.setId(id);
+		this.setName(name);
+		this.addResolvers(noOfParameters);
 	}
 
 	@Override
@@ -36,7 +39,7 @@ public class BfTemplateType extends TemplateContextType {
 		super.resolve(variable, context);
 	}
 	
-	private void addResolvers() {
+	private void addResolvers(int noOfParameters) {
 		addResolver(new GlobalTemplateVariables.Cursor());
 		addResolver(new GlobalTemplateVariables.WordSelection());
 		addResolver(new GlobalTemplateVariables.LineSelection());
@@ -46,15 +49,13 @@ public class BfTemplateType extends TemplateContextType {
 		addResolver(new GlobalTemplateVariables.Time());
 		addResolver(new GlobalTemplateVariables.User());
 		
-		for (Field f : BfNamedParameterResolver.class.getFields()) {
-			if (Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers()) && f.getType().equals(TemplateVariableResolver.class)) {
-				try {
-					addResolver((TemplateVariableResolver)f.get(null));
-				} 
-				catch (IllegalArgumentException | IllegalAccessException | ClassCastException ex) {
-					BfActivator.getDefault().logError("Template Variables could not be resolved", ex);
-				}
-			}
+		addResolver(new EvalResolver("eval", "Evaluates an expression. Returns empty String, used to define intermediate variables used as parameters"));
+		addResolver(new BfMemShiftResolver("mem_shift", "Inserts (number) of memory pointer shifts. Negative parameter shifts left, positive shifts right"));
+		addResolver(new BfIncDecResolver("inc_dec", "Inserts (number) of increments/decrements. Negative parameter decrements, positive increments"));
+		addResolver(new BfKeyResolver("trigger_key", "Evaluates to the text on which the template proposal was triggered"));
+		
+		for (int i = noOfParameters; i>0; i--) {
+			addResolver(new BfNamedParameterResolver(i));
 		}
 	}
 

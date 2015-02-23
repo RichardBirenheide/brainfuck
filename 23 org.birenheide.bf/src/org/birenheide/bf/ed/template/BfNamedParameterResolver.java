@@ -1,5 +1,8 @@
 package org.birenheide.bf.ed.template;
 
+import java.text.ChoiceFormat;
+import java.text.MessageFormat;
+
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
@@ -17,6 +20,18 @@ public class BfNamedParameterResolver extends TemplateVariableResolver {
 
 	public BfNamedParameterResolver(String type, String description) {
 		super(type, description);
+	}
+	
+	BfNamedParameterResolver(int parameterNo) {
+		MessageFormat form = new MessageFormat("{0} parameter");
+		double[] limits = {1,2,3,4};
+		String[] inserts = {"{0,number}st", "{0,number}nd", "{0,number}rd","{0,number}th"};
+		ChoiceFormat cform = new ChoiceFormat(limits, inserts);
+		form.setFormatByArgumentIndex(0, cform);
+		
+		String description = form.format(new Object[]{parameterNo});
+		this.setDescription(description);
+		this.setType("x" + (parameterNo - 1));
 	}
 
 	@Override

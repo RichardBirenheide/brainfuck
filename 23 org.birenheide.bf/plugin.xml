@@ -448,39 +448,9 @@
    </extension>
    <extension
          point="org.eclipse.ui.editors.templates">
-      <contextType
-            class="org.birenheide.bf.ed.template.BfTemplateType"
-            id="org.birenheide.bf.brainfuck"
-            name="Brainfuck"
-            registryId="org.birenheide.bf.BfEditor">
-      </contextType>
       <contextTypeRegistry
             id="org.birenheide.bf.BfEditor">
       </contextTypeRegistry>
-      <resolver
-            class="org.birenheide.bf.ed.template.BfMemShiftResolver"
-            contextTypeId="org.birenheide.bf.brainfuck"
-            description="Inserts (number) of memory pointer shifts. Negative parameter shifts left, positive shifts right"
-            type="mem_shift">
-      </resolver>
-      <resolver
-            class="org.birenheide.bf.ed.template.BfIncDecResolver"
-            contextTypeId="org.birenheide.bf.brainfuck"
-            description="Inserts (number) of increments/decrements. Negative parameter decrements, positive increments"
-            type="inc_dec">
-      </resolver>
-      <resolver
-            class="org.birenheide.bf.ed.template.BfKeyResolver"
-            contextTypeId="org.birenheide.bf.brainfuck"
-            description="Evaluates to the text on which the template proposal was triggered"
-            type="trigger_key">
-      </resolver>
-      <resolver
-            class="org.birenheide.bf.ed.template.EvalResolver"
-            contextTypeId="org.birenheide.bf.brainfuck"
-            description="Evaluates an expression. Returns empty String, used to define intermediate variables used as parameters"
-            type="eval">
-      </resolver>
       <include
             file="templates/default.xml">
       </include>

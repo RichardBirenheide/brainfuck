@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.ed.template.BfTemplateType;
+import org.birenheide.bf.ed.template.ParametrizedTemplateTypeDescriptor;
 import org.birenheide.bf.ui.BfImages;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPartitioningException;
@@ -41,7 +41,18 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 	@Override
 	protected TemplateContextType getContextType(ITextViewer viewer,
 			IRegion region) {
-		return BfActivator.getDefault().getTemplateContextTypeRegistry().getContextType(BfTemplateType.TYPE_ID);
+		try {
+			String prefix = viewer.getDocument().get(region.getOffset(), region.getLength());
+			int parameterCount = parseParameters(prefix).size();
+			TemplateContextType type = ParametrizedTemplateTypeDescriptor.findTemplateType(parameterCount);
+			if (type != null) {
+				return type;
+			}
+		} 
+		catch (BadLocationException ex) {
+			BfActivator.getDefault().logError("Context type could not be evaluated", ex);
+		}
+		return ParametrizedTemplateTypeDescriptor.NoParameters.templateType;
 	}
 
 	@Override
@@ -72,21 +83,7 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 
 	@Override
 	protected int getRelevance(Template template, String prefix) {
-		int parameterCount = parseParameters(prefix).size();
-		int templateParameterCount = 0;
-		while (template.getPattern().contains("x" + templateParameterCount)) {
-			templateParameterCount++;
-		}
-		if (parameterCount == templateParameterCount) {
-			return 100;
-		}
-		else if (templateParameterCount == 0) {
-			return 20;
-		}
-		else if (templateParameterCount < parameterCount) {
-			return 10;
-		}
-		return -1;
+		return super.getRelevance(template, prefix);
 	}
 
 	@Override

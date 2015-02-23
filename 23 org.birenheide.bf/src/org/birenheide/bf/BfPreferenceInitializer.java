@@ -1,7 +1,6 @@
 package org.birenheide.bf;
 
 import org.birenheide.bf.ed.BfEditor;
-import org.birenheide.bf.ed.template.BfTemplateType;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -13,7 +12,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 
 public class BfPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	public static final String TEMPLATE_KEY = BfTemplateType.TYPE_ID;
+	public static final String TEMPLATE_KEY = "org.birenheide.bf.brainfuck";
 	public static final String CONTINUE_LAUNCH_WITH_FILE_ERRORS = "continueLaunchWithFileErrors";
 	
 	@Override

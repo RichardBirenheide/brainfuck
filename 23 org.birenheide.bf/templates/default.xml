@@ -2,7 +2,7 @@
 <templates>
 	<template 
 		autoinsert="true" 
-		context="org.birenheide.bf.brainfuck" 
+		context="org.birenheide.bf.p0" 
 		deleted="false" 
 		description="Clears the current memory location" 
 		enabled="true" 
@@ -11,7 +11,7 @@
 		
 	<template 
 		autoinsert="true" 
-		context="org.birenheide.bf.brainfuck" 
+		context="org.birenheide.bf.p3" 
 		deleted="false" 
 		description="Copy cell y to cell x using temp; use on pattern x;y;temp" 
 		enabled="true" 
@@ -24,7 +24,7 @@ ${7:mem_shift('temp-y')}[${6}+${7}-]</template>
 	
 	<template 
 		autoinsert="true" 
-		context="org.birenheide.bf.brainfuck" 
+		context="org.birenheide.bf.p0" 
 		deleted="false" 
 		description="Scans to the right until an empty cell is found" 
 		enabled="true"
@@ -33,7 +33,7 @@ ${7:mem_shift('temp-y')}[${6}+${7}-]</template>
 		
 	<template 
 		autoinsert="true" 
-		context="org.birenheide.bf.brainfuck" 
+		context="org.birenheide.bf.p0" 
 		deleted="false" 
 		description="Safe comment (between empty brackets)" 
 		enabled="true"
@@ -42,7 +42,7 @@ ${7:mem_shift('temp-y')}[${6}+${7}-]</template>
 	
 	<template 
 		autoinsert="true" 
-		context="org.birenheide.bf.brainfuck" 
+		context="org.birenheide.bf.p1" 
 		deleted="false" 
 		description="Shifts memory pointer {n} positions" 
 		enabled="true"
@@ -51,7 +51,7 @@ ${7:mem_shift('temp-y')}[${6}+${7}-]</template>
 	
 	<template 
 		autoinsert="true" 
-		context="org.birenheide.bf.brainfuck" 
+		context="org.birenheide.bf.p1" 
 		deleted="false" 
 		description="Increment/decrement memory by {n}" 
 		enabled="true"

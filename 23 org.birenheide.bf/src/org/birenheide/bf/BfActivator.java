@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.birenheide.bf.debug.ui.BfUIListenerContributor;
 import org.birenheide.bf.ed.template.BfTemplateType;
+import org.birenheide.bf.ed.template.ParametrizedTemplateTypeDescriptor;
 import org.birenheide.bf.ui.BfImages;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -38,6 +39,9 @@ public class BfActivator extends AbstractUIPlugin {
 		this.uiContributor.addListeners();
 		this.registry = new ContributionContextTypeRegistry(BfTemplateType.REGISTRY_ID);
 //		this.registry.addContextType(new BfTemplateType("org.birenheide.bf.brainfuck.p1", "1 Parameter"));
+		for (ParametrizedTemplateTypeDescriptor desc : ParametrizedTemplateTypeDescriptor.values()) {
+			this.registry.addContextType(desc.templateType);
+		}
 		this.templateStore = new ContributionTemplateStore(registry, this.getPreferenceStore(), BfPreferenceInitializer.TEMPLATE_KEY);
 		try {
 			this.templateStore.load();
