@@ -37,6 +37,7 @@ public class BfActivator extends AbstractUIPlugin {
 		instance = this;
 		this.uiContributor.addListeners();
 		this.registry = new ContributionContextTypeRegistry(BfTemplateType.REGISTRY_ID);
+//		this.registry.addContextType(new BfTemplateType("org.birenheide.bf.brainfuck.p1", "1 Parameter"));
 		this.templateStore = new ContributionTemplateStore(registry, this.getPreferenceStore(), BfPreferenceInitializer.TEMPLATE_KEY);
 		try {
 			this.templateStore.load();

@@ -2,11 +2,13 @@ package org.birenheide.bf.ed.template;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 import org.birenheide.bf.BfActivator;
 import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
+import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
 
@@ -55,4 +57,19 @@ public class BfTemplateType extends TemplateContextType {
 			}
 		}
 	}
+
+	@Override
+	protected void validateVariables(TemplateVariable[] variables)
+			throws TemplateException {
+		for (TemplateVariable variable : variables) {
+			TemplateVariableResolver resolver = this.getResolver(variable.getType());
+			if (resolver != null && (resolver instanceof ExpressionEvaluator)) {
+				@SuppressWarnings("unchecked")
+				List<String> params = (variable.getVariableType().getParams());
+				((ExpressionEvaluator) resolver).supportsParameters(params);
+			}
+		}
+	}
+	
+	
 }

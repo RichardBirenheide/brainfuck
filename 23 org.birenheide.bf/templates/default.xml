@@ -18,9 +18,9 @@
 		id="org.birenheide.bf.template.copy"
 		name="copy">Copy ${trigger_key}${x:eval(x0)}${y:eval(x1)}${temp:eval(x2)}
 ${1:mem_shift(temp)}[-]
-${2:mem_shift(x,'-',temp)}[-]
-${3:mem_shift(y,'-',x)}[${4:mem_shift(x,'-',y)}+${5:mem_shift(temp,'-',x)}+${6:mem_shift(y,'-',temp)}-]
-${7:mem_shift(temp,'-',y)}[${6}+${7}-]</template>
+${2:mem_shift('x-temp')}[-]
+${3:mem_shift('y-x')}[${4:mem_shift('x-y')}+${5:mem_shift('temp-x')}+${6:mem_shift('y-temp')}-]
+${7:mem_shift('temp-y')}[${6}+${7}-]</template>
 	
 	<template 
 		autoinsert="true" 
@@ -35,7 +35,7 @@ ${7:mem_shift(temp,'-',y)}[${6}+${7}-]</template>
 		autoinsert="true" 
 		context="org.birenheide.bf.brainfuck" 
 		deleted="false" 
-		description="Scans to the right until an empty cell is found" 
+		description="Safe comment (between empty brackets)" 
 		enabled="true"
 		id="org.birenheide.bf.template.comment"  
 		name="comment">[-][  ]</template>	
