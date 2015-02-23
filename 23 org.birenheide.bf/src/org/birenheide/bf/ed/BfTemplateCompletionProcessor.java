@@ -22,6 +22,17 @@ import org.eclipse.swt.graphics.Image;
 
 class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 	
+	static List<String> parseParameters(String prefix) {
+		List<String> parameters = new ArrayList<>(Arrays.asList(prefix.split(";")));
+		for (Iterator<String> i = parameters.iterator(); i.hasNext();) {
+			String param = i.next();
+			if ("".equals(param.trim())) {
+				i.remove();
+			}
+		}
+		return parameters;
+	}
+	
 	@Override
 	protected Template[] getTemplates(String contextTypeId) {
 		return BfActivator.getDefault().getTemplateStore().getTemplates(contextTypeId);
@@ -61,7 +72,7 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 
 	@Override
 	protected int getRelevance(Template template, String prefix) {
-		int parameterCount = this.parseParameters(prefix).size();
+		int parameterCount = parseParameters(prefix).size();
 		int templateParameterCount = 0;
 		while (template.getPattern().contains("x" + templateParameterCount)) {
 			templateParameterCount++;
@@ -84,7 +95,7 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 		try {
 			String prefix = viewer.getDocument().get(region.getOffset(), region.getLength());
 			int i = 0;
-			for (String param : this.parseParameters(prefix)) {
+			for (String param : parseParameters(prefix)) {
 				context.setVariable("x" + (i++), param);
 			}
 		} 
@@ -93,16 +104,5 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 		}
 		
 		return context;
-	}
-	
-	private List<String> parseParameters(String prefix) {
-		List<String> parameters = new ArrayList<>(Arrays.asList(prefix.split(";")));
-		for (Iterator<String> i = parameters.iterator(); i.hasNext();) {
-			String param = i.next();
-			if ("".equals(param.trim())) {
-				i.remove();
-			}
-		}
-		return parameters;
 	}
 }
