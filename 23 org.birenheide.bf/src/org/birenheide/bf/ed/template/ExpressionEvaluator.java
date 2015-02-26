@@ -3,7 +3,7 @@ package org.birenheide.bf.ed.template;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.birenheide.bf.BfActivator;
+import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
@@ -16,7 +16,7 @@ import org.eclipse.jface.text.templates.TemplateVariableResolver;
  *             | ( '(' expression ')' )
  *             | number
  *             | variable
- * operator   := '+' | '-' | '*' | '/'
+ * operator   := '+' | '-' | '*' | '/' | '%'
  * number     := signed integer
  * variable	  := sign [a-z,A-Z] ([a-z,0-9,a-z])*
  * sign       := '' | '-'
@@ -52,7 +52,7 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 		return true;
 	}
 	
-	List<Integer> resolve(List<String> params, TemplateContext context) {
+	final List<Integer> resolve(List<String> params, TemplateContext context) {
 		List<Integer> result = new ArrayList<>(params.size());
 		for (String expression : params) {
 			try {
@@ -60,21 +60,26 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 				Integer value = ex.calculateValue(context);
 				result.add(value);
 			}
+			catch (VariableEvaluationException ex) {
+				throw ex;
+			}
 			catch (TemplateException | RuntimeException ex) {
-				BfActivator.getDefault().logError("Expression could not be evaluated for parameter: " + expression, ex);
-				result.add(null);
+				throw new VariableEvaluationException(ex.getMessage(), ex);
 			}
 		}
 		return result;
 	}
 	
-	void parse(List<String> params) throws TemplateException {
+	final void parse(List<String> params) throws TemplateException {
 		for (String expression : params) {
 			try {
-				new ComplexExpression(expression);
+				if (expression.trim().isEmpty()) {
+					throw new TemplateException("Empty expression");
+				}
+				new ComplexExpression(expression.trim());
 			}
 			catch (RuntimeException ex) {
-				throw new TemplateException(ex.getMessage(), ex);
+				throw new TemplateException("Invalid expression: " + expression + "; " + ex.getMessage(), ex);
 			}
 		}
 //		if (messages.size() > 0) {
@@ -86,6 +91,13 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 //		}
 	}
 	
+	/**
+	 * Checks whether the parameters given are supported by this resolver.<br>
+	 * the default implementation does nothing.
+	 * @param parameters the parameters to check
+	 * @throws TemplateException if one of the parameters does not conform to the specifications.
+	 * The message should be user friendly.
+	 */
 	void supportsParameters(List<String> parameters) throws TemplateException {
 	}
 	
@@ -94,7 +106,7 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 	 *
 	 */
 	private static abstract class Expression {
-		abstract int calculateValue(TemplateContext context);
+		abstract int calculateValue(TemplateContext context) throws VariableEvaluationException;
 	}
 	
 	/**
@@ -102,33 +114,60 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 	 *
 	 */
 	private static class ValueOrVariableExpression extends Expression {
-		private final String expression;
+		private final String value;
+		private final boolean isVariable;
+		private final char sign;
 		
-		ValueOrVariableExpression(String expression) {
-			this.expression = expression;
+		ValueOrVariableExpression(String expression) throws TemplateException {
+			String check = expression;
+			if (expression.startsWith("-")) {
+				check = check.substring(1).trim();
+				this.sign = '-';
+			}
+			else {
+				this.sign = '+';
+			}
+			if (check.isEmpty()) {
+				throw new TemplateException("Invalid variable: " + expression);
+			}
+			this.isVariable = Character.isLetter(check.charAt(0));
+			for (int i = 0; i < check.length(); i++) {
+				if (!Character.isLetterOrDigit(check.charAt(i)) ||
+						(!this.isVariable && !Character.isDigit(check.charAt(i)))) {
+					throw new TemplateException("Invalid value or variable: " + expression);
+				}
+			}
+			if (this.isVariable) {
+				this.value = check;
+			}
+			else {
+				this.value = expression;
+			}
  		}
 
 		@Override
 		int calculateValue(TemplateContext context) {
-			String exp = this.expression;
-			String prefix = "";
-			if (exp.startsWith("-")) {
-				prefix = "-";
-				exp = exp.substring(1);
-			}
 			String parseValue = null;
-			char first = exp.charAt(0);
-			if (Character.isLetter(first)) {//Variable
-				String val = context.getVariable(exp);
-				if (val == null) {
-					throw new IllegalStateException("Variable " + exp + " is undefined in context");
+			if (this.isVariable) {
+				parseValue = context.getVariable(this.value);
+				if (parseValue == null) {
+					String contextInfo = "";
+					if (context instanceof DocumentTemplateContext) {
+						contextInfo = ": '" + ((DocumentTemplateContext) context).getKey() + "'";
+					}
+					throw new VariableEvaluationException("Variable " + this.value + " is undefined in context"+ contextInfo);
 				}
-				parseValue = prefix + val;
+				parseValue = this.sign + parseValue;
 			}
 			else {
-				parseValue = prefix + exp;
+				parseValue = this.value;
 			}
-			return Integer.parseInt(parseValue);
+			try {
+				return Integer.parseInt(parseValue);
+			}
+			catch (NumberFormatException ex) {
+				throw new VariableEvaluationException(ex.getMessage(), ex);
+			}
 		}
 	}
 	
@@ -153,18 +192,12 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 				}
 				shouldStartWithOp = exp.substring(splitAt).trim();
 			}
-//			else if (Character.isLetter(first)) { //Variable
-//				int splitAt = this.parseToken(exp);
-//				String variable = exp.substring(0, splitAt).trim();
-//				left = new VariableExpression(variable);
-//				if (splitAt == exp.length()) {
-//					return; //Exhausted
-//				}
-//				shouldStartWithOp = exp.substring(splitAt).trim();
-//			}
 			else if (first == '(') {//Opening bracket
 				int openBrackets = 1;
 				int i = 1;
+				if (i == exp.length()) {
+					throw new TemplateException("Non matching brackets: " + exp);
+				}
 				char c = 0;
 				do {
 					c = exp.charAt(i);
@@ -183,6 +216,9 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 					throw new TemplateException("Non matching brackets: " + exp);
 				}
 				String bracketExp = exp.substring(1, i).trim();
+				if (bracketExp.isEmpty()) {
+					throw new TemplateException("Empty brackets: " + exp);
+				}
 				this.left = new ComplexExpression(bracketExp);
 				if (i + 1 == exp.length()) {
 					return;//Exhausted
@@ -190,15 +226,16 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 				shouldStartWithOp = exp.substring(i + 1).trim();
 			}
 			if (shouldStartWithOp == null || shouldStartWithOp.isEmpty()) {
-				throw new TemplateException("Inbalanced operator: " + shouldStartWithOp);
+				throw new TemplateException("Inbalanced operator: " + exp);
 			}
 			this.op = this.parseOperator(shouldStartWithOp);
 			String remainder = shouldStartWithOp.substring(1).trim();
 
 			if (remainder.isEmpty()) {
-				throw new TemplateException("Inbalanced operator"); 
+				throw new TemplateException("Inbalanced operator: " + exp); 
 			}
-			if ((this.op == Operator.MULTPLY || this.op == Operator.DIVIDE) && !remainder.startsWith("(")) {
+			if ((this.op == Operator.MULTPLY || this.op == Operator.DIVIDE || this.op == Operator.MODULO) 
+					&& !remainder.startsWith("(")) {
 				int splitAt = this.parseToken(remainder);
 				String l = remainder.substring(0, splitAt);
 				if (splitAt < remainder.length()) {
@@ -230,6 +267,8 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 					return Operator.MULTPLY;
 				case '/' : 
 					return Operator.DIVIDE;
+				case '%' :
+					return Operator.MODULO;
 				case '+' :
 					return Operator.ADD;
 				case '-' :
@@ -271,12 +310,14 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 					return left.calculateValue(context) * right.calculateValue(context);
 				case DIVIDE :
 					return left.calculateValue(context) / right.calculateValue(context);
+				case MODULO :
+					return left.calculateValue(context) % right.calculateValue(context);
 				case ADD :
 					return left.calculateValue(context) + right.calculateValue(context);
 				case SUBTRACT :
 					return left.calculateValue(context) - right.calculateValue(context);
 				default :
-					throw new IllegalArgumentException("Invalid Operator" + op);
+					throw new VariableEvaluationException("Invalid Operator" + op);
 					
 			}
 		}
@@ -289,6 +330,7 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 	private static enum Operator {
 		MULTPLY,
 		DIVIDE,
+		MODULO,
 		ADD,
 		SUBTRACT
 		

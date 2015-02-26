@@ -58,9 +58,11 @@ public class BfBreakpoint extends LineBreakpoint implements IBfBreakpoint {
 	}
 	
 	void setInstalled(boolean installed, BfDebugTarget target) {
-		if (installed && !this.installedTargets.contains(target)) {
-			this.installedTargets.add(target);
-			DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged(this);
+		if (installed) {
+			if (!this.installedTargets.contains(target)) {
+				this.installedTargets.add(target);
+				DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged(this);
+			}
 		}
 		else {
 			if (this.installedTargets.remove(target)) {

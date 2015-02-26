@@ -38,13 +38,13 @@ ${7:mem_shift('temp-y')}[${6}+${7}-]</template>
 		description="Safe comment (between empty brackets)" 
 		enabled="true"
 		id="org.birenheide.bf.template.comment"  
-		name="comment">[-][  ]</template>	
+		name="comment">[-][ ${cursor} ]</template>	
 	
 	<template 
 		autoinsert="true" 
 		context="org.birenheide.bf.p1" 
 		deleted="false" 
-		description="Shifts memory pointer {n} positions" 
+		description="Shifts memory pointer {x0} positions" 
 		enabled="true"
 		id="org.birenheide.bf.template.memShift"  
 		name="memshift">${:mem_shift(x0)}</template>
@@ -53,8 +53,17 @@ ${7:mem_shift('temp-y')}[${6}+${7}-]</template>
 		autoinsert="true" 
 		context="org.birenheide.bf.p1" 
 		deleted="false" 
-		description="Increment/decrement memory by {n}" 
+		description="Increment/decrement memory by {x0}" 
 		enabled="true"
 		id="org.birenheide.bf.template.IncDec"  
 		name="inc_dec">${:inc_dec(x0)}</template>
+		
+	<template 
+		autoinsert="true" 
+		context="org.birenheide.bf.p1" 
+		deleted="false" 
+		description="Scans to the right for {x0} consecutive empty cells" 
+		enabled="true"
+		id="org.birenheide.bf.template.scanx"  
+		name="x_scan">${1:repeat(x0,'[')}${2:repeat(x0,'&gt;]')}${3:repeat('x0-1','&lt;')}</template>		
 </templates>

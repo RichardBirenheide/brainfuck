@@ -1,12 +1,24 @@
 package org.birenheide.bf;
 
 public class Pair<F, S> {
-	public final F first;
-	public final S second;
+	/**
+	 * First value of the tuple. Can be <code>null</code>.
+	 */
+	public final F fst;
+	/**
+	 * Second value of the tuple. Can be <code>null</code>.
+	 */
+	public final S scnd;
 	
+	/**
+	 * Creates a pair from the values given.
+	 * <code>null</code> values are permissible.
+	 * @param first first value.
+	 * @param second second value.
+	 */
 	public Pair(F first, S second) {
-		this.first = first;
-		this.second = second;
+		this.fst = first;
+		this.scnd = second;
 	}
 
 	@Override
@@ -14,9 +26,9 @@ public class Pair<F, S> {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((this.first == null) ? 0 : this.first.hashCode());
+				+ ((this.fst == null) ? 0 : this.fst.hashCode());
 		result = prime * result
-				+ ((this.second == null) ? 0 : this.second.hashCode());
+				+ ((this.scnd == null) ? 0 : this.scnd.hashCode());
 		return result;
 	}
 
@@ -33,18 +45,18 @@ public class Pair<F, S> {
 		}
 		@SuppressWarnings("rawtypes")
 		Pair other = (Pair) obj;
-		if (this.first == null) {
-			if (other.first != null) {
+		if (this.fst == null) {
+			if (other.fst != null) {
 				return false;
 			}
-		} else if (!this.first.equals(other.first)) {
+		} else if (!this.fst.equals(other.fst)) {
 			return false;
 		}
-		if (this.second == null) {
-			if (other.second != null) {
+		if (this.scnd == null) {
+			if (other.scnd != null) {
 				return false;
 			}
-		} else if (!this.second.equals(other.second)) {
+		} else if (!this.scnd.equals(other.scnd)) {
 			return false;
 		}
 		return true;
@@ -52,6 +64,6 @@ public class Pair<F, S> {
 
 	@Override
 	public String toString() {
-		return "Pair [first=" + this.first + ", second=" + this.second + "]";
+		return "Pair [first=" + this.fst + ", second=" + this.scnd + "]";
 	}
 }

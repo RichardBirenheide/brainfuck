@@ -172,21 +172,11 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		return new InformationPresenter(getInformationControlCreator(sourceViewer));
 	}
 	
-	
-	
 	@Override
 	public IInformationControlCreator getInformationControlCreator(
 			ISourceViewer sourceViewer) {
-//		return new AbstractReusableInformationControlCreator() {
-//			@Override
-//			protected IInformationControl doCreateInformationControl(Shell parent) {
-//				DefaultInformationControl informationControl = new DefaultInformationControl(parent, "Press 'F2' for focus");
-//				return informationControl;
-//			}
-//		};
 		return new InformationControlCreator();
 	}
-
 
 
 	/**

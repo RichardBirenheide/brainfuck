@@ -32,12 +32,12 @@ abstract class PreferenceColorRule implements IRule {
 	
 	IToken getToken(String foregroundColorKey) {
 		RGB requiredColor = PreferenceConverter.getColor(store, foregroundColorKey);
-		if (!this.tokens.containsKey(foregroundColorKey) || !this.tokens.get(foregroundColorKey).first.equals(requiredColor)) {
+		if (!this.tokens.containsKey(foregroundColorKey) || !this.tokens.get(foregroundColorKey).fst.equals(requiredColor)) {
 			Color newColor = EditorsUI.getSharedTextColors().getColor(requiredColor);
 			IToken newToken = new Token(new TextAttribute(newColor, null, this.getStyle(foregroundColorKey)));
 			this.tokens.put(foregroundColorKey, new Pair<>(requiredColor, newToken));
 		}
-		return this.tokens.get(foregroundColorKey).second;
+		return this.tokens.get(foregroundColorKey).scnd;
 	}
 	
 	int getStyle(String foregroundColorKey) {
