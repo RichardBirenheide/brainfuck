@@ -13,6 +13,7 @@ import org.birenheide.bf.debug.core.BfDebugTarget;
 import org.birenheide.bf.debug.core.BfStackFrame;
 import org.birenheide.bf.debug.core.BfWatchpoint;
 import org.birenheide.bf.ed.BfEditor;
+import org.birenheide.bf.ed.EditorConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
@@ -90,11 +91,11 @@ public class BfDebugModelPresentation implements
 	public String getEditorId(IEditorInput input, Object element) {
 		if (element instanceof IFile) {
 			if (((IFile) element).getFileExtension().equals("bf")) {
-				return BfEditor.EDITOR_ID;
+				return EditorConstants.EDITOR_ID;
 			}
 		}
 		else if (element instanceof BfBreakpoint) {
-			return BfEditor.EDITOR_ID;
+			return EditorConstants.EDITOR_ID;
 		}
 		return EditorsUI.DEFAULT_TEXT_EDITOR_ID;
 	}

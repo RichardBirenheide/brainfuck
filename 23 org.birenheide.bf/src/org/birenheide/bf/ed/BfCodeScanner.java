@@ -37,14 +37,14 @@ class BfCodeScanner extends BufferedRuleBasedScanner {
 			}
 			char value = (char) val;
 			if (BrainfuckInterpreter.isReservedChar(value)) {
-				return this.getToken(BfEditor.EDITOR_KEY_CHAR_COLOR_PREF);
+				return this.getToken(EditorConstants.PREF_EDITOR_KEY_CHAR_COLOR);
 			}
-			return this.getToken(BfEditor.EDITOR_OTHER_CHAR_COLOR_PREF);
+			return this.getToken(EditorConstants.PREF_EDITOR_OTHER_CHAR_COLOR);
 		}
 
 		@Override
 		int getStyle(String foregroundColorKey) {
-			if (foregroundColorKey.equals(BfEditor.EDITOR_KEY_CHAR_COLOR_PREF)) {
+			if (foregroundColorKey.equals(EditorConstants.PREF_EDITOR_KEY_CHAR_COLOR)) {
 				return SWT.BOLD;
 			}
 			return super.getStyle(foregroundColorKey);

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.ed.BfEditor;
+import org.birenheide.bf.ed.EditorConstants;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -19,7 +19,7 @@ public class NewBfFileCreationWizardPage extends WizardNewFileCreationPage {
 
 	public NewBfFileCreationWizardPage(IStructuredSelection selection) {
 		super(PAGE_NAME, selection);
-		this.setFileExtension(BfEditor.BF_FILE_EXTENSION);
+		this.setFileExtension(EditorConstants.BF_FILE_EXTENSION);
 		this.setTitle(PAGE_NAME);
 //		this.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor("IMG_WIZBAN_NEW_WIZ"));
 		this.setImageDescriptor(JFaceResources.getImageRegistry().getDescriptor(TitleAreaDialog.DLG_IMG_TITLE_BANNER));

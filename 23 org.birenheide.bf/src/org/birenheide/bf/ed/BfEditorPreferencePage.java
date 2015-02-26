@@ -43,9 +43,6 @@ public class BfEditorPreferencePage extends PreferencePage implements
 	private static final String RESTORE_DEFAULTS_TEXT = "Restore Defaults";
 	private static final String COLOR_LABEL_TEXT = "Color:";
 	
-	public static final String ID = "org.birenheide.bf.Editor";
-	
-	
 	private Button bracketHighlighting = null;
 	private Button showMatchingBracket = null;
 	private Button showCaretLocation = null;
@@ -55,11 +52,11 @@ public class BfEditorPreferencePage extends PreferencePage implements
 	
 	private List colorPreferenceList = null;
 	private java.util.List<ColorPreference> colorPreferenceStore = Arrays.asList(
-				new ColorPreference(BfEditor.EDITOR_MATCHING_BRACKETS_COLOR_PREF, "Matching brackets highlight"),
-				new ColorPreference(BfEditor.EDITOR_KEY_CHAR_COLOR_PREF, "Key characters color"),
-				new ColorPreference(BfEditor.EDITOR_COMMENT_CHAR_COLOR_PREF, "Comment character color"),
-				new ColorPreference(BfEditor.EDITOR_TEMPLATE_PARAMS_COLOR_PREF, "Template parameter character color"),
-				new ColorPreference(BfEditor.EDITOR_OTHER_CHAR_COLOR_PREF, "Non-key character color")
+				new ColorPreference(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_COLOR, "Matching brackets highlight"),
+				new ColorPreference(EditorConstants.PREF_EDITOR_KEY_CHAR_COLOR, "Key characters color"),
+				new ColorPreference(EditorConstants.PREF_EDITOR_COMMENT_CHAR_COLOR, "Comment character color"),
+				new ColorPreference(EditorConstants.PREF_EDITOR_TEMPLATE_PARAMS_COLOR, "Template parameter character color"),
+				new ColorPreference(EditorConstants.PREF_EDITOR_OTHER_CHAR_COLOR, "Non-key character color")
 			);
 	private ColorSelector colorSelector;
 	
@@ -201,10 +198,10 @@ public class BfEditorPreferencePage extends PreferencePage implements
 	public boolean performOk() {
 		IPreferenceStore store = this.getPreferenceStore();
 		boolean editorCloseBracket = this.closeBrackets.getSelection();
-		store.setValue(BfEditor.EDITOR_CLOSE_BRACKET, editorCloseBracket);
+		store.setValue(EditorConstants.PREF_EDITOR_CLOSE_BRACKET, editorCloseBracket);
 		
 		boolean highlightBrackets = this.bracketHighlighting.getSelection();
-		store.setValue(BfEditor.EDITOR_MATCHING_BRACKETS_PREF, highlightBrackets);
+		store.setValue(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS, highlightBrackets);
 		
 		boolean showCaretLocation = false;
 		boolean showEnclosing = false;
@@ -219,8 +216,8 @@ public class BfEditorPreferencePage extends PreferencePage implements
 			showCaretLocation = true;
 			showEnclosing = true;
 		}
-		store.setValue(BfEditor.EDITOR_MATCHING_BRACKETS_SHOW_CARET, showCaretLocation);
-		store.setValue(BfEditor.EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING, showEnclosing);
+		store.setValue(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_CARET, showCaretLocation);
+		store.setValue(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING, showEnclosing);
 		
 		for (ColorPreference pref : this.colorPreferenceStore) {
 			pref.writeValue();
@@ -241,14 +238,14 @@ public class BfEditorPreferencePage extends PreferencePage implements
 	
 	private void initializeValues(boolean setDefaults) {
 		IPreferenceStore store = this.getPreferenceStore();
-		boolean editorCloseBracket = setDefaults ? store.getDefaultBoolean(BfEditor.EDITOR_CLOSE_BRACKET) : store.getBoolean(BfEditor.EDITOR_CLOSE_BRACKET);
+		boolean editorCloseBracket = setDefaults ? store.getDefaultBoolean(EditorConstants.PREF_EDITOR_CLOSE_BRACKET) : store.getBoolean(EditorConstants.PREF_EDITOR_CLOSE_BRACKET);
 		this.closeBrackets.setSelection(editorCloseBracket);
 		
-		boolean highlightBrackets = setDefaults ? store.getDefaultBoolean(BfEditor.EDITOR_MATCHING_BRACKETS_PREF) : store.getBoolean(BfEditor.EDITOR_MATCHING_BRACKETS_PREF);
+		boolean highlightBrackets = setDefaults ? store.getDefaultBoolean(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS) : store.getBoolean(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS);
 		this.bracketHighlighting.setSelection(highlightBrackets);
 
-		boolean showCaret = setDefaults ? store.getDefaultBoolean(BfEditor.EDITOR_MATCHING_BRACKETS_SHOW_CARET) : store.getBoolean(BfEditor.EDITOR_MATCHING_BRACKETS_SHOW_CARET);
-		boolean showEnclosing = setDefaults ? store.getDefaultBoolean(BfEditor.EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING) : store.getBoolean(BfEditor.EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING);
+		boolean showCaret = setDefaults ? store.getDefaultBoolean(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_CARET) : store.getBoolean(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_CARET);
+		boolean showEnclosing = setDefaults ? store.getDefaultBoolean(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING) : store.getBoolean(EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING);
 		this.showMatchingBracket.setSelection(!showEnclosing && !showCaret);
 		this.showCaretLocation.setSelection(showCaret && !showEnclosing);
 		this.showEnclosingBrackets.setSelection(showEnclosing && showCaret);

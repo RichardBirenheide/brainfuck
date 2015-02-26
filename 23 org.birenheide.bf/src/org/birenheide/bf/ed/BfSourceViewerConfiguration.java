@@ -71,16 +71,16 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		
 		dr = new DefaultDamagerRepairer(new BfCodeScanner(fPreferenceStore));
-		reconciler.setDamager(dr, BfPartitionScanner.BRAINFUCK_CODE);
-		reconciler.setRepairer(dr, BfPartitionScanner.BRAINFUCK_CODE);
+		reconciler.setDamager(dr, EditorConstants.PARTITION_TYPE_BRAINFUCK_CODE);
+		reconciler.setRepairer(dr, EditorConstants.PARTITION_TYPE_BRAINFUCK_CODE);
 		
-		dr = new DefaultDamagerRepairer(new SingleColorScanner(fPreferenceStore, BfEditor.EDITOR_COMMENT_CHAR_COLOR_PREF));
-		reconciler.setDamager(dr, BfPartitionScanner.MULTILINE_COMMENT);
-		reconciler.setRepairer(dr, BfPartitionScanner.MULTILINE_COMMENT);
+		dr = new DefaultDamagerRepairer(new SingleColorScanner(fPreferenceStore, EditorConstants.PREF_EDITOR_COMMENT_CHAR_COLOR));
+		reconciler.setDamager(dr, EditorConstants.PARTITION_TYPE_MULTILINE_COMMENT);
+		reconciler.setRepairer(dr, EditorConstants.PARTITION_TYPE_MULTILINE_COMMENT);
 		
-		dr = new DefaultDamagerRepairer(new SingleColorScanner(fPreferenceStore, BfEditor.EDITOR_TEMPLATE_PARAMS_COLOR_PREF));
-		reconciler.setDamager(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
-		reconciler.setRepairer(dr, BfPartitionScanner.TEMPLATE_PARAMETERS);
+		dr = new DefaultDamagerRepairer(new SingleColorScanner(fPreferenceStore, EditorConstants.PREF_EDITOR_TEMPLATE_PARAMS_COLOR));
+		reconciler.setDamager(dr, EditorConstants.PARTITION_TYPE_TEMPLATE_PARAMETERS);
+		reconciler.setRepairer(dr, EditorConstants.PARTITION_TYPE_TEMPLATE_PARAMETERS);
 		
 		return reconciler;
 	}
@@ -112,14 +112,14 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return new String[]{
 				IDocument.DEFAULT_CONTENT_TYPE, 
-				BfPartitionScanner.BRAINFUCK_CODE, 
-				BfPartitionScanner.MULTILINE_COMMENT, 
-				BfPartitionScanner.TEMPLATE_PARAMETERS};
+				EditorConstants.PARTITION_TYPE_BRAINFUCK_CODE, 
+				EditorConstants.PARTITION_TYPE_MULTILINE_COMMENT, 
+				EditorConstants.PARTITION_TYPE_TEMPLATE_PARAMETERS};
 	}
 
 	@Override
 	public String getConfiguredDocumentPartitioning(ISourceViewer sourceViewer) {
-		return  BfDocSetupParticipant.BF_PARTITIONING;
+		return  EditorConstants.BF_PARTITIONING;
 	}
 
 	@Override
@@ -135,7 +135,7 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		assistant.setDocumentPartitioning(this.getConfiguredDocumentPartitioning(sourceViewer));
 		CompletionProposalToggler toggler = new CompletionProposalToggler();
 		assistant.setContentAssistProcessor(toggler, IDocument.DEFAULT_CONTENT_TYPE);
-		assistant.setContentAssistProcessor(toggler, BfPartitionScanner.BRAINFUCK_CODE);
+		assistant.setContentAssistProcessor(toggler, EditorConstants.PARTITION_TYPE_BRAINFUCK_CODE);
 		assistant.addCompletionListener(toggler);		
 		assistant.setStatusLineVisible(true);
 		assistant.setRepeatedInvocationMode(true);
@@ -151,14 +151,14 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 				return new DefaultInformationControl(parent);
 			}
 		});
-		assistant.setContentAssistProcessor(null, BfPartitionScanner.MULTILINE_COMMENT);
+		assistant.setContentAssistProcessor(null, EditorConstants.PARTITION_TYPE_MULTILINE_COMMENT);
 		return assistant;
 	}
 	
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer,
 			String contentType) {
-		if (BfPartitionScanner.TEMPLATE_PARAMETERS.equals(contentType)) {
+		if (EditorConstants.PARTITION_TYPE_TEMPLATE_PARAMETERS.equals(contentType)) {
 			return new ParametersTextHover(sourceViewer);
 		}
 		else {
@@ -190,7 +190,7 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 			if (command.getCommandCount() == 1 
 					&& command.length == 0 
 					&& command.text.equals("[")
-					&& BfSourceViewerConfiguration.this.fPreferenceStore.getBoolean(BfEditor.EDITOR_CLOSE_BRACKET)) {
+					&& BfSourceViewerConfiguration.this.fPreferenceStore.getBoolean(EditorConstants.PREF_EDITOR_CLOSE_BRACKET)) {
 				
 				command.text = command.text + "]";
 				command.caretOffset = command.offset + 1;
@@ -265,10 +265,23 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 					text = this.hoverContributions.get(provideText.getType()).getHoverText(provideText, textViewer, hoverRegion);
 				}
 				else {
-					text = provideText.getText();
+					text = "<b>" +  provideText.getText() + "</b>";
 				}
-//				System.out.println(">" + text + "<");
-				text = "<b>" + text + "</b>";
+			}
+			try {
+				if (text == null) {
+					IDocument document = textViewer.getDocument();
+					if (document instanceof IDocumentExtension3) {
+						IDocumentExtension3 ext3 = (IDocumentExtension3) document;
+						ITypedRegion partition = ext3.getPartition(EditorConstants.BF_PARTITIONING, hoverRegion.getOffset(), false);
+						if (EditorConstants.PARTITION_TYPE_BRAINFUCK_CODE.equals(partition.getType())) {
+							text = "Offset: [<b>" + hoverRegion.getOffset() + "</b>]";
+						}
+					}
+				}
+			}
+			catch (BadLocationException | BadPartitioningException ex) {
+				BfActivator.getDefault().logError("hoverRegion partitioning could not be evaluated", ex);
 			}
 			return text;
 		}
@@ -307,7 +320,7 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 		
 		@Override
 		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
-			if (!(hoverRegion instanceof ITypedRegion) && !((ITypedRegion) hoverRegion).getType().equals(BfPartitionScanner.TEMPLATE_PARAMETERS)) {
+			if (!(hoverRegion instanceof ITypedRegion) && !((ITypedRegion) hoverRegion).getType().equals(EditorConstants.PARTITION_TYPE_TEMPLATE_PARAMETERS)) {
 				return null;
 			}
 			try {
@@ -352,7 +365,7 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 				
 				if (doc instanceof IDocumentExtension3) {
 					IDocumentExtension3 ext3 = (IDocumentExtension3) doc;
-					region = ext3.getPartition(BfDocSetupParticipant.BF_PARTITIONING, offset, true);
+					region = ext3.getPartition(EditorConstants.BF_PARTITIONING, offset, true);
 				}
 				else {
 					region = doc.getPartition(offset);

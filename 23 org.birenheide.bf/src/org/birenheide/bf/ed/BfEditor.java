@@ -36,25 +36,6 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
 public class BfEditor extends TextEditor {
 
-	public static final String EDITOR_MATCHING_BRACKETS_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBrackets";
-	public static final String EDITOR_MATCHING_BRACKETS_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBracketsColor";
-	public static final String EDITOR_MATCHING_BRACKETS_SHOW_CARET = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBracketsShowCaretLocation";
-	public static final String EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING = BfActivator.BUNDLE_SYMBOLIC_NAME + ".matchingBracketsShowEnclosedBrackets";
-	
-	public static final String EDITOR_CLOSE_BRACKET= BfActivator.BUNDLE_SYMBOLIC_NAME + ".closeBracket";
-	
-	public static final String EDITOR_KEY_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".keyCharColor";
-	public static final String EDITOR_OTHER_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".otherCharColor";
-	public static final String EDITOR_COMMENT_CHAR_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".commentCharColor";
-	public static final String EDITOR_TEMPLATE_PARAMS_COLOR_PREF = BfActivator.BUNDLE_SYMBOLIC_NAME + ".templateParamsColor";
-	
-	public static final String EDITOR_ID = "org.birenheide.bf.BrainfuckEditor";
-	
-	/**
-	 * File extension for Brainfuck files: {@value}.
-	 */
-	public static final String BF_FILE_EXTENSION = "bf";
-	
 	private BfContentValidator validator = new BfContentValidator();
 	
 	@Override
@@ -71,14 +52,14 @@ public class BfEditor extends TextEditor {
 		DefaultCharacterPairMatcher matcher = 
 				new DefaultCharacterPairMatcher(
 						new char[]{'[', ']'}, 
-						BfDocSetupParticipant.BF_PARTITIONING, 
+						EditorConstants.BF_PARTITIONING, 
 						true);
 		support.setCharacterPairMatcher(matcher);
 		support.setMatchingCharacterPainterPreferenceKeys(
-				EDITOR_MATCHING_BRACKETS_PREF, 
-				EDITOR_MATCHING_BRACKETS_COLOR_PREF, 
-				EDITOR_MATCHING_BRACKETS_SHOW_CARET, 
-				EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING);
+				EditorConstants.PREF_EDITOR_MATCHING_BRACKETS, 
+				EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_COLOR, 
+				EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_CARET, 
+				EditorConstants.PREF_EDITOR_MATCHING_BRACKETS_SHOW_ENCLOSING);
 	}
 
 	@Override
@@ -114,10 +95,10 @@ public class BfEditor extends TextEditor {
 	@Override
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event) {
 		String property = event.getProperty();
-		if (EDITOR_KEY_CHAR_COLOR_PREF.equals(property) || 
-				EDITOR_COMMENT_CHAR_COLOR_PREF.equals(property) ||
-				EDITOR_TEMPLATE_PARAMS_COLOR_PREF.equals(property) ||
-				EDITOR_OTHER_CHAR_COLOR_PREF.equals(property)) {
+		if (EditorConstants.PREF_EDITOR_KEY_CHAR_COLOR.equals(property) || 
+				EditorConstants.PREF_EDITOR_COMMENT_CHAR_COLOR.equals(property) ||
+				EditorConstants.PREF_EDITOR_TEMPLATE_PARAMS_COLOR.equals(property) ||
+				EditorConstants.PREF_EDITOR_OTHER_CHAR_COLOR.equals(property)) {
 			if (this.getSourceViewer() != null) {
 				this.getSourceViewer().invalidateTextPresentation();
 			}
@@ -138,11 +119,11 @@ public class BfEditor extends TextEditor {
 			PreferenceDialog dialog = 
 					PreferencesUtil.createPreferenceDialogOn(
 							null, 
-							BfEditorPreferencePage.ID, 
+							EditorConstants.PREF_PAGE_EDITOR_ID, 
 							new String[]{
-									BfEditorPreferencePage.ID, 
+									EditorConstants.PREF_PAGE_EDITOR_ID, 
 									BfTemplatePreferencePage.ID, 
-									"org.eclipse.ui.preferencePages.GeneralTextEditor"}, 
+									EditorConstants.PREF_PAGE_GENERAL_TEXT_EDITOR_ID}, 
 							null);
 			dialog.open();
 		}
@@ -248,7 +229,7 @@ public class BfEditor extends TextEditor {
 
 		@Override
 		public void documentAboutToBeChanged(DocumentEvent event) {
-			if (event.fText.equals("[") && getPreferenceStore().getBoolean(EDITOR_CLOSE_BRACKET)) { //Exactly one character added
+			if (event.fText.equals("[") && getPreferenceStore().getBoolean(EditorConstants.PREF_EDITOR_CLOSE_BRACKET)) { //Exactly one character added
 				int offset = event.fOffset;
 				IDocument doc = event.fDocument;
 				try {

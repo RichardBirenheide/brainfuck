@@ -82,8 +82,8 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 				return super.extractPrefix(viewer, offset);
 			}
 			IDocumentExtension3 document3 = (IDocumentExtension3) viewer.getDocument();
-			ITypedRegion previousRegion = document3.getPartition(BfDocSetupParticipant.BF_PARTITIONING, offset - 1, false);
-			if (BfPartitionScanner.TEMPLATE_PARAMETERS.equals(previousRegion.getType())) {
+			ITypedRegion previousRegion = document3.getPartition(EditorConstants.BF_PARTITIONING, offset - 1, false);
+			if (EditorConstants.PARTITION_TYPE_TEMPLATE_PARAMETERS.equals(previousRegion.getType())) {
 				return viewer.getDocument().get(previousRegion.getOffset(), previousRegion.getLength());
 			}
 		} 

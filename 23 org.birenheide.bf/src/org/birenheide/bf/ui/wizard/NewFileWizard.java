@@ -1,7 +1,7 @@
 package org.birenheide.bf.ui.wizard;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.ed.BfEditor;
+import org.birenheide.bf.ed.EditorConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -57,7 +57,7 @@ public class NewFileWizard extends Wizard implements INewWizard {
 			return true;
 		}
 		try {
-			workbench.getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(createdFile[0]), BfEditor.EDITOR_ID);
+			workbench.getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(createdFile[0]), EditorConstants.EDITOR_ID);
 		} 
 		catch (PartInitException ex) {
 			BfActivator.getDefault().logError("Editor for new file could not be opened: " + createdFile[0], ex);

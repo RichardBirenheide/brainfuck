@@ -10,18 +10,6 @@ import org.eclipse.jface.text.rules.Token;
 
 public class BfPartitionScanner extends RuleBasedPartitionScanner {
 	
-	public static final String BRAINFUCK_CODE = "__brainfuck_code";
-	public static final String TEMPLATE_PARAMETERS = "__template_parameters";
-	public static final String MULTILINE_COMMENT = "__brainfuck_multiline_comment";
-	
-	public static final String[] BRAINFUCK_PARTITION_TYPES = 
-			new String[] {
-				BRAINFUCK_CODE, 
-				TEMPLATE_PARAMETERS, 
-				MULTILINE_COMMENT
-				};
-	
-
 	public BfPartitionScanner() {
 		super();
 		IPredicateRule bfCodeRule = new BfCodeRule();
@@ -42,7 +30,7 @@ public class BfPartitionScanner extends RuleBasedPartitionScanner {
 
 		private static final String END_TOKEN = "[-][";
 		
-		private final IToken successToken = new Token(BRAINFUCK_CODE);
+		private final IToken successToken = new Token(EditorConstants.PARTITION_TYPE_BRAINFUCK_CODE);
 		
 		@Override
 		public IToken evaluate(ICharacterScanner scanner, boolean resume) {
@@ -108,7 +96,7 @@ public class BfPartitionScanner extends RuleBasedPartitionScanner {
 	 */
 	private static class CommentRule extends MultiLineRule {
 		CommentRule() {
-			super("[-][", "]", new Token(MULTILINE_COMMENT), (char) 0, true);
+			super("[-][", "]", new Token(EditorConstants.PARTITION_TYPE_MULTILINE_COMMENT), (char) 0, true);
 		}
 
 		@Override
@@ -140,7 +128,7 @@ public class BfPartitionScanner extends RuleBasedPartitionScanner {
 	 */
 	private static class TemplateParametersRule implements IPredicateRule {
 		
-		private final IToken successToken = new Token(TEMPLATE_PARAMETERS);
+		private final IToken successToken = new Token(EditorConstants.PARTITION_TYPE_TEMPLATE_PARAMETERS);
 
 		@Override
 		public IToken evaluate(ICharacterScanner scanner) {

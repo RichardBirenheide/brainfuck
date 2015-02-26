@@ -58,6 +58,9 @@ public class BfLaunchShortcut implements ILaunchShortcut {
 				String name = file.getName();
 				if (name.contains(".")) {
 					name = name.substring(0, name.lastIndexOf('.'));
+					if (name.length() > 0) {
+						name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+					}
 				}
 				name = DebugPlugin.getDefault().getLaunchManager().generateLaunchConfigurationName(name);
 				ILaunchConfigurationWorkingCopy lc = bfType.newInstance(null, name);

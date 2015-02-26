@@ -22,10 +22,12 @@ public class InstructionPointerAnnotationHover implements AnnotationHover {
 		if (adaptable instanceof BfStackFrame) {
 			BfStackFrame stackFrame = (BfStackFrame) adaptable;
 			try {
+				int instructionPointer = stackFrame.getCharStart();
+				String text = "Instruction Pointer: [<b>" + instructionPointer + "</b>]";
 				int memoryPointer = stackFrame.getMemoryPointer();
 				IMemoryBlock memoryBlock = stackFrame.getDebugTarget().getMemoryBlock(memoryPointer, 1);
 				byte value = memoryBlock.getBytes()[0];
-				String text = annotation.getText() + "\nMemory Value: [0x" + Integer.toHexString(memoryPointer).toUpperCase() + "]=0x" + Integer.toHexString((value & 0xFF));
+				text = text + "<br>Memory Value: [<b>0x" + Integer.toHexString(memoryPointer).toUpperCase() + "</b>]=<b>0x" + Integer.toHexString((value & 0xFF)) + "</b>";
 				return text;
 			} 
 			catch (DebugException ex) {
