@@ -3,8 +3,8 @@ package org.birenheide.bf.debug.ui;
 import static org.birenheide.bf.BfActivator.BUNDLE_SYMBOLIC_NAME;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.BfPreferenceInitializer;
 import org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate;
+import org.birenheide.bf.debug.core.PreferenceInitializer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -31,7 +31,7 @@ public class ErrorDialogStatusHandler implements IStatusHandler {
 	}
 	
 	private Boolean handleFileError(IFile file) {
-		String launchAlways = BfActivator.getDefault().getPreferenceStore().getString(BfPreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS);
+		String launchAlways = BfActivator.getDefault().getPreferenceStore().getString(PreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS);
 		if (MessageDialogWithToggle.ALWAYS.equals(launchAlways)) {
 			return true;
 		}
@@ -50,7 +50,7 @@ public class ErrorDialogStatusHandler implements IStatusHandler {
 		int result = dialog.open();
 		if (result == IDialogConstants.PROCEED_ID) {
 			if (dialog.getToggleState()) {
-				BfActivator.getDefault().getPreferenceStore().setValue(BfPreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS, MessageDialogWithToggle.ALWAYS);
+				BfActivator.getDefault().getPreferenceStore().setValue(PreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS, MessageDialogWithToggle.ALWAYS);
 			}
 			return true;
 		}

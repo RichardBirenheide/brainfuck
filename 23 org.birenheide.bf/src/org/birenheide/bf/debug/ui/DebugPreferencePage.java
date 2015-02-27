@@ -1,7 +1,7 @@
 package org.birenheide.bf.debug.ui;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.BfPreferenceInitializer;
+import org.birenheide.bf.debug.core.PreferenceInitializer;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -9,10 +9,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -20,6 +20,7 @@ public class DebugPreferencePage extends PreferencePage implements IWorkbenchPre
 
 
 	private Button alwaysLaunchOnError;
+	private Button enableHotCodeReplacement;
 	
 	public DebugPreferencePage() {
 		super();
@@ -43,13 +44,15 @@ public class DebugPreferencePage extends PreferencePage implements IWorkbenchPre
 		area.setLayoutData(GridDataFactory.fillDefaults().create());
 		area.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 		
-		Label placeholder = new Label(area, SWT.NONE);
-		placeholder.setLayoutData(GridDataFactory.swtDefaults().span(2, 1).create());
-		placeholder.setText(" ");
+		Point newParagraph = new Point(0, this.convertHeightInCharsToPixels(1));
 		
 		this.alwaysLaunchOnError = new Button(area, SWT.CHECK);
-		this.alwaysLaunchOnError.setLayoutData(GridDataFactory.swtDefaults().span(2, 1).create());
+		this.alwaysLaunchOnError.setLayoutData(GridDataFactory.swtDefaults().indent(newParagraph).span(2, 1).create());
 		this.alwaysLaunchOnError.setText("Always launch files with errors");
+		
+		this.enableHotCodeReplacement = new Button(area, SWT.CHECK);
+		this.enableHotCodeReplacement.setLayoutData(GridDataFactory.swtDefaults().indent(newParagraph).span(2, 1).create());
+		this.enableHotCodeReplacement.setText("Enable hot code replacement");
 		
 		this.initializeValues();
 		
@@ -58,18 +61,20 @@ public class DebugPreferencePage extends PreferencePage implements IWorkbenchPre
 
 	@Override
 	protected void performDefaults() {
-		this.alwaysLaunchOnError.setSelection(this.getPreferenceStore().getDefaultString(BfPreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS).equals(MessageDialogWithToggle.ALWAYS));
+		this.alwaysLaunchOnError.setSelection(this.getPreferenceStore().getDefaultString(PreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS).equals(MessageDialogWithToggle.ALWAYS));
+		this.enableHotCodeReplacement.setSelection(this.getPreferenceStore().getDefaultBoolean(PreferenceInitializer.ENABLE_HOT_CODE_REPLACEMENT));
 		super.performDefaults();
 	}
 
 	@Override
 	public boolean performOk() {
 		if (this.alwaysLaunchOnError.getSelection()) {
-			this.getPreferenceStore().setValue(BfPreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS, MessageDialogWithToggle.ALWAYS);
+			this.getPreferenceStore().setValue(PreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS, MessageDialogWithToggle.ALWAYS);
 		}
 		else {
-			this.getPreferenceStore().setValue(BfPreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS, MessageDialogWithToggle.PROMPT);
+			this.getPreferenceStore().setValue(PreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS, MessageDialogWithToggle.PROMPT);
 		}
+		this.getPreferenceStore().setValue(PreferenceInitializer.ENABLE_HOT_CODE_REPLACEMENT, this.enableHotCodeReplacement.getSelection());
 		return super.performOk();
 	}
 
@@ -79,7 +84,8 @@ public class DebugPreferencePage extends PreferencePage implements IWorkbenchPre
 	}
 
 	private void initializeValues() {
-		this.alwaysLaunchOnError.setSelection(this.getPreferenceStore().getString(BfPreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS).equals(MessageDialogWithToggle.ALWAYS));
+		this.alwaysLaunchOnError.setSelection(this.getPreferenceStore().getString(PreferenceInitializer.CONTINUE_LAUNCH_WITH_FILE_ERRORS).equals(MessageDialogWithToggle.ALWAYS));
+		this.enableHotCodeReplacement.setSelection(this.getPreferenceStore().getBoolean(PreferenceInitializer.ENABLE_HOT_CODE_REPLACEMENT));
 	}
 	
 }

@@ -470,6 +470,9 @@
       <initializer
             class="org.birenheide.bf.BfPreferenceInitializer">
       </initializer>
+      <initializer
+            class="org.birenheide.bf.debug.core.PreferenceInitializer">
+      </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

@@ -321,11 +321,16 @@ public class BfDebugTarget extends BfDebugElement implements IDebugTarget {
 		super.fireTerminateEvent();
 	}
 	
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
 	private class ResourceListener implements IResourceChangeListener {
 		
 		private final IFile target;
 		private boolean changed = false;
 		private boolean outOfsync = false;
+		private boolean propertyChanged = true;
 		
 		ResourceListener(IFile file) {
 			this.target = file;
@@ -333,33 +338,62 @@ public class BfDebugTarget extends BfDebugElement implements IDebugTarget {
 
 		@Override
 		public void resourceChanged(IResourceChangeEvent event) {
+			this.propertyChanged = false;
 			IResourceDelta fileDelta = event.getDelta().findMember(this.target.getFullPath());
 			if (fileDelta != null) {
 				boolean contentChanged = ((fileDelta.getFlags() & IResourceDelta.CONTENT) != 0);
 				if (fileDelta.getKind() == IResourceDelta.CHANGED && contentChanged) {
-					if (this.changed == false) {
-						this.changed = true;
-						BfDebugTarget.this.fireChangeEvent(DebugEvent.CONTENT);
-					}
+					this.setChanged(true);
 					try {
-						char[] newProgram = BfDebugTarget.this.getProcess().getContentsAsString(this.target).toCharArray();
-						BfDebugTarget.this.getProcess().getInterpreter().replaceProgam(newProgram);
-						this.outOfsync = false;
+						if (BfActivator.getDefault().getPreferenceStore().getBoolean(PreferenceInitializer.ENABLE_HOT_CODE_REPLACEMENT)) {
+							char[] newProgram = BfDebugTarget.this.getProcess().getContentsAsString(this.target).toCharArray();
+							BfDebugTarget.this.getProcess().getInterpreter().replaceProgam(newProgram);
+							this.setOutofSync(false);
+						}
+						else {
+							this.setOutofSync(true);
+						}
 					} 
 					catch (CoreException ex) {
 						BfActivator.getDefault().logError("File could not be replaced", ex);
-						this.outOfsync = true;
+						this.setOutofSync(true);
 					}
 				}
 			}
+			if (this.propertyChanged) {
+				BfDebugTarget.this.fireChangeEvent(DebugEvent.CONTENT);
+			}
 		}
 		
+		/**
+		 * Evaluates whether the code has been changed.
+		 * @return <code>true</code> if the coding being debugged has been modified.
+		 */
 		boolean hasChanged() {
 			return this.changed;
 		}
 		
+		/**
+		 * Evaluates whether the actual code represents the code being debugged.
+		 * @return <code>true</code> if the actual coding represents the code being
+		 * debugged, <code>false</code> otherwise. 
+		 */
 		boolean isOutOfSync() {
 			return this.outOfsync;
+		}
+		
+		private void setChanged(boolean changed) {
+			if (!this.propertyChanged) {
+				this.propertyChanged = this.changed != changed;
+			}
+			this.changed = changed;
+		}
+		
+		private void setOutofSync(boolean outOfSync) {
+			if (!this.propertyChanged) {
+				this.propertyChanged = this.outOfsync != outOfSync;
+			}
+			this.outOfsync = outOfSync;
 		}
 	}
 }
