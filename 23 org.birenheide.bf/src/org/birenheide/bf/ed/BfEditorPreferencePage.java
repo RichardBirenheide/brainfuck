@@ -93,10 +93,7 @@ public class BfEditorPreferencePage extends PreferencePage implements
 		this.bracketHighlighting.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				boolean active = bracketHighlighting.getSelection();
-				showMatchingBracket.setEnabled(active);
-				showCaretLocation.setEnabled(active);
-				showEnclosingBrackets.setEnabled(active);
+				setBracketGroupEnablement();
 			}
 		});
 		
@@ -249,8 +246,16 @@ public class BfEditorPreferencePage extends PreferencePage implements
 		this.showMatchingBracket.setSelection(!showEnclosing && !showCaret);
 		this.showCaretLocation.setSelection(showCaret && !showEnclosing);
 		this.showEnclosingBrackets.setSelection(showEnclosing && showCaret);
+		this.setBracketGroupEnablement();
 		
 		this.initializeColorValues(setDefaults);
+	}
+	
+	private void setBracketGroupEnablement() {
+		boolean active = bracketHighlighting.getSelection();
+		showMatchingBracket.setEnabled(active);
+		showCaretLocation.setEnabled(active);
+		showEnclosingBrackets.setEnabled(active);
 	}
 	
 	private void initializeColorValues(boolean setDefaults) {

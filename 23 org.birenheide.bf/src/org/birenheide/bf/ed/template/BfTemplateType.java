@@ -52,7 +52,7 @@ public class BfTemplateType extends TemplateContextType {
 		addResolver(new BfMemShiftResolver("mem_shift", "Inserts (number) of memory pointer shifts. Negative parameter shifts left, positive shifts right"));
 		addResolver(new BfIncDecResolver("inc_dec", "Inserts (number) of increments/decrements. Negative parameter decrements, positive increments"));
 		addResolver(new BfKeyResolver("trigger_key", "Evaluates to the text on which the template proposal was triggered"));
-		addResolver(new PatternGenerator("repeat", "Repeats a pattern x0 times and deletes x1 characters from the result"));
+		addResolver(new PatternGenerator("repeat", ":repeat(ex1, pattern, ex2) repeats the pattern ex1 times and deletes ex2 characters from the result"));
 		
 		for (int i = noOfParameters; i>0; i--) {
 			addResolver(new BfNamedParameterResolver(i));

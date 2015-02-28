@@ -41,7 +41,6 @@ Change the 'Text as' checkbox for
 to visualize both locations precisely in the Editor. Locations of both span the location where they start to 
 the character next to them.
 </p>
-<p>
 <h3>Settings</h3>
 <ul>
 <li>
@@ -70,7 +69,7 @@ Color of the characters being key characters for Brainfuck.
 Color of all non-key characters of Brainfuck.
 </li>
 </ul>
-</p>
+
 
 <h2>
 <a name="Templates" href='javascript:liveAction(
@@ -90,10 +89,10 @@ Color of all non-key characters of Brainfuck.
       <ul>
         <li><strong>Simple</strong> variables take the following form:
           <p><strong><code>${trigger_key}</code></strong></p>
-          <p>This defines a variable with name <code>trigger_key</code> that will resolve to the String which preceeds the code completion trigger.</p>
+          <p>This defines a variable with name <code>trigger_key</code> that will resolve to the String which precedes the code completion trigger.</p>
         </li>
         <li><strong>Full</strong> variables take the following form:
-          <p><strong><code>${three_shifts:mem_shift(3)}</code></strong></p>
+          <p><strong><code>${three_shifts:mem_shift('3')}</code></strong></p>
           <p>This defines a variable with name <code>three_shifts</code> that will resolve to 
           <code>&gt;&gt;&gt;</code>. It can be referenced multiple times by simply giving its name 
           without the type: <code>${three_shifts}</code>.
@@ -106,13 +105,39 @@ Color of all non-key characters of Brainfuck.
           
         </li>
       </ul>
-      <h3><a name="parameters">Parameters obtained from the template trigger location</a></h3>
+    <h3>Template types and template parameters</h3>
+    <p>
+    For each number of parameters up to five a template type exists to enable easy filtering of code completion
+    template proposals. The proposals are filtered for the number of preceding parameters, therefore new templates
+    should be put into the type corresponding to the number of parameters the template expects. 
+    </p>
+    <h3><a name="parameters">Parameters obtained from the template trigger location</a></h3>
     <p>
     Templates can pick up parameters from the source code. When a template is triggered from the source code
     the preceding characters are parsed and split along semicolons. The resulting values can be referenced in
     templates by <code>x0,x1,...,xn</code>. These variables are automatically mixed into the template context.
     Numerical values must be preceded by <code>!</code> (exclamation mark) to designate negative values. 
     </p>  
+    <h3><a name="expressions">Expressions</a></h3>
+    <p>
+    Some variables take parameters in the form of numerical expressions. These variables must be stated as full variables
+    and the expression must be put in single quotes. When editing templates the parser tries to guide to valid
+    expressions. The existence of variables is not checked during template editing. Variables are those either
+    being predefined or ones defined within the template. In this case they must be defined before using them
+    and they must evaluate to a numeric integer value. The allowed syntax for expressions is:
+    </p>
+    <table border="0">
+    <tr>
+    <td>expression</td> <td>:=</td> <td>( expression operator expression )<td></tr> 
+    <tr><td></td>          <td align="center">|</td><td>( '(' expression ')' )<td></tr>
+    <tr><td></td>          <td align="center">|</td><td> number</td></tr>
+	<tr><td></td>          <td align="center">|</td><td> variable</td></tr>
+  	<tr><td>operator</td>   <td>:=</td> <td>'+' | '-' | '*' | '/' | '%'</td></tr>
+  	<tr><td>number</td>     <td>:=</td> <td>signed 32 bit integer</td></tr>
+  	<tr><td>variable</td>	  <td>:=</td> <td>sign [a-z,A-Z] ([a-z,0-9,A-Z])*</td></tr>
+  	<tr><td>sign</td>       <td>:=</td> <td>empty string | '-'</td></tr>
+    </table>
+
     <h3><a name="template_vars">Template Variables</a></h3>
     <p>Brainfuck context defines the following variables.
     	<b>Note:</b> In the table below, <i>id</i> is a user-chosen name of a new variable.</p>
@@ -138,76 +163,54 @@ Color of all non-key characters of Brainfuck.
           <td>Evaluates to the dollar symbol <code>$</code>. Alternatively, two dollars can be used: <code>$$</code>.</td>
         </tr>
       	<tr>
-          <td><strong>${<i>id</i>:eval(<i>n</i>)}</strong> or <br>
-          	<strong>${<i>id</i>:eval(<i>n, operation, k</i>)}</td>
-          <td>Either stores the value of <code>n</code> in variable <code>id</code> or stores the value of the operation
-          	  between <code>n</code> and <code>k</code> in <code>id</code>.
+          <td><strong>${<i>id</i>:eval(<i>expression</i>)}</strong></td>
+          <td>Stores the value of <code>expression</code> in variable <code>id</code>. The output of the variable
+          will be the empty string. Nothing will be inserted at the variable definition location into the template.
+          The variable <code>id</code> can later be used in other expressions as shorthand.
           	  <p>
-				<strong>${eval}</strong> allows for the following operations:
-				<ul>
-				<li><strong>+</strong> for adding the first and the third argument</li>
-				<li><strong>plus</strong> for adding the first and the third argument</li>
-				<li><strong>-</strong> for subtracting the third from the first argument</li>
-				<li><strong>minus</strong> for subtracting the third from the first argument</li>
-				</ul>
+				<strong>${eval}</strong> allows for the <a href="#expressions">expressions</a> defined above. The 
+				expression must be put between single quotes.
 			</p>
               <p>Example:<br>
-              <code>${first:eval(<a href="#parameters">x0</a>, '-', <a href="#parameters">x1</a>)}</code> sets the value of <code>first</code> to <code>2</code> if the template is triggered on <code>6;4</code> in the code.
+              <code>${first:eval('<a href="#parameters">x0</a> - <a href="#parameters">x1</a>')}</code> sets the value 
+              of <code>first</code> to <code>2</code> if the template is triggered on <code>6;4</code> in the code.
             </p>
           
           </td>
         </tr>        
         <tr>
-          <td><strong>${<i>id</i>:inc_dec(<i>n</i>)}</strong> or <br>
-              <strong>${<i>id</i>:inc_dec(<i>n, operation, k</i>)}</strong></td>
-          <td>Evaluates to <i>n</i> increments or decrements. Positive values will increment, negative values will decrement.
-              Negative values can be preceded with the exclamation mark to avoid conflicts with the minus sign which is a Brainfuck key character.
-              <i>n</i> can also be a reference of a parameter variable.
+          <td><strong>${<i>id</i>:inc_dec(<i>expression</i>)}</strong></td>
+          <td>Evaluates to <i>expression</i> increments or decrements. Positive values will increment, negative values will decrement.
+          See also <a href="#expressions">expressions</a> for valid parameters to <code>inc_dec</code>.
               <p>Example:<br>
-              <code>${dec_three:inc_dec('-3')}</code> evaluates to <code>---</code><br>
-              <code>${a:inc_dec(<a href="#parameters">x1</a>)}</code> evaluates to <code>---</code> if the template is triggered after <code>1;!3</code> in the code.
+              <code>${dec_three:inc_dec('-3')}</code> evaluates to <code>---</code>.<br>
+              <code>${a:inc_dec('<a href="#parameters">x1</a>')}</code> evaluates to <code>---</code> if the 
+              template is triggered after <code>1;!3</code> in the code.
             </p>
-			<p>
-				<strong>${inc_dec}</strong> takes three arguments as well to allow calculations on positions. <strong><i>operation</i></strong> may take the following values:
-				<ul>
-				<li><strong>+</strong> for adding the first and the third argument</li>
-				<li><strong>plus</strong> for adding the first and the third argument</li>
-				<li><strong>-</strong> for subtracting the third from the first argument</li>
-				<li><strong>minus</strong> for subtracting the third from the first argument</li>
-				</ul>
-				This allows easy calculation of relative increments/decrements to a fixed argument obtained via parameter variables.
-			</p>
-			<p>
-				Example:<br>
-				<code>${a:inc_dec(<a href="#parameters">x0</a>,'-',<a href="#parameters">x1</a>)}</code> evaluates to <code>---</code> if the template is triggered after <code>4;7</code> in the code.<br>
-			</p>          
           </td>
         </tr>
         <tr>
-          <td><strong>${<i>id</i>:mem_shift(<i>n</i>)}</strong> or <br>
-              <strong>${<i>id</i>:mem_shift(<i>n, operation, k</i>)}</strong></td>
-          <td>Evaluates to <i>n</i> shifts of the memory pointer. Positive values will shift to right, negative values will shift to left.
-              Negative values can be preceded with the exclamation mark to avoid conflicts with the minus sign which is a Brainfuck key character.
-              <i>n</i> can also be a reference of a parameter variable.
+          <td><strong>${<i>id</i>:mem_shift(<i>expression</i>)}</strong></td>
+          <td>Evaluates to <i>expression</i> shifts of the memory pointer. Positive values will shift to right, negative values will shift to left.
+              See also <a href="#expressions">expressions</a> for valid parameters to <code>mem_shift</code>.
               <p>Example:<br>
-              <code>${shift_three:mem_shift('-3')}</code> evaluates to <code>&lt;&lt;&lt;</code><br>
-              <code>${a:mem_shift(<a href="#parameters">x1</a>)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>1;!3</code> in the code.
+              <code>${shift_three:mem_shift('-3')}</code> evaluates to <code>&lt;&lt;&lt;</code>.<br>
+              <code>${a:mem_shift('<a href="#parameters">x1</a>')}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>1;!3</code> in the code.
             </p>
-			<p>
-				<strong>${mem_shift}</strong> takes three arguments as well to allow calculations on positions. <strong><i>operation</i></strong> may take the following values:
-				<ul>
-				<li><strong>+</strong> for adding the first and the third argument</li>
-				<li><strong>plus</strong> for adding the first and the third argument</li>
-				<li><strong>-</strong> for subtracting the third from the first argument</li>
-				<li><strong>minus</strong> for subtracting the third from the first argument</li>
-				</ul>
-				This allows easy calculation of relative shifts to a fixed argument obtained via parameter variables.
-			</p>
-			<p>
-				Example:<br>
-				<code>${a:mem_shift(<a href="#parameters">x0</a>,'-',<a href="#parameters">x1</a>)}</code> evaluates to <code>&lt;&lt;&lt;</code> if the template is triggered after <code>4;7</code> in the code.<br>
-				A more elaborate example can be found in the built-in template <strong><i>copy</i></copy>.
-			</p>          
+          </td>
+        </tr>
+        <tr>
+          <td><strong>${<i>id</i>:repeat(<i>expression1</i>, <i>pattern</i>, <i>expression2</i>)}</strong></td>
+          <td>Evaluates to <code>expression1</code> repetitions of <code>pattern</code>. 
+          <code>expression2</code> characters will be removed from the final result string. The third parameter is optional.
+          The expression parameters must resolve to positive values.
+              See also <a href="#expressions">expressions</a> for valid parameters to <code>repeat</code>.
+              <p>Example:<br>
+              <code>${three_brackets:repeat('4', '[]', '2')}</code> evaluates to <code>[][][]</code>.<br>
+              <code>${a:repeat('<a href="#parameters">x0</a>', '+&gt;', '<a href="#parameters">x1</a>')}</code> evaluates to <code>+&gt;+&gt;+&gt;+</code> 
+              if the template is triggered after <code>4;1</code> in the code.
+            </p>
+            <p>See also predefined template x_scan for an example.</p> 
           </td>
         </tr>
         <tr>
@@ -237,7 +240,8 @@ Color of all non-key characters of Brainfuck.
         </tr>
         <tr>
           <td><strong><a href="#parameters">x0</a></strong> to <strong><a href="#parameters">x&lt;<i>n</i>&gt;</a></strong></td>
-          <td>Predefined variables which can be referenced as parameters. They contain the value of the <i>n</i>-th parameter provided on triggering the template.</td>
+          <td>Predefined variables which can be referenced as parameters. They contain the value of 
+          the <i>n</i>-th parameter provided on triggering the template.</td>
         </tr>
         
         <tr>
