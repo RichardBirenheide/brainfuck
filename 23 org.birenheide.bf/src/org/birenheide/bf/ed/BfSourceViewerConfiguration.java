@@ -101,7 +101,7 @@ class BfSourceViewerConfiguration extends TextSourceViewerConfiguration {
 			public String getHoverInfo(ISourceViewer sourceViewer,
 					int lineNumber) {
 				String raw = super.getHoverInfo(sourceViewer, lineNumber);
-				String result = raw.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>");
+				String result = raw != null ? raw.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>") : null;
 				return result;
 			}
 		};

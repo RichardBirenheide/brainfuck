@@ -8,7 +8,7 @@ import java.util.Deque;
 import java.util.List;
 
 import org.birenheide.bf.BfActivator;
-import org.birenheide.bf.ui.BfTemplatePreferencePage;
+import org.birenheide.bf.ed.template.BfTemplatePreferencePage;
 import org.birenheide.bf.ui.HelpContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;

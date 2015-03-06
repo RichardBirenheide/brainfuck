@@ -44,7 +44,6 @@
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            category="org.birenheide.bf"
             delegate="org.birenheide.bf.debug.core.BfLaunchConfigurationDelegate"
             delegateDescription="Running and Debugging of Brainfuck Files"
             delegateName="Brainfuck Launcher"
@@ -77,7 +76,6 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            category="org.birenheide.bf"
             class="org.birenheide.bf.debug.ui.BfLaunchShortcut"
             icon="icons/brainfuck.gif"
             id="org.birenheide.bf.launch.shortcut"
@@ -489,7 +487,7 @@
       </page>
       <page
             category="org.birenheide.bf.MainPage"
-            class="org.birenheide.bf.ui.BfTemplatePreferencePage"
+            class="org.birenheide.bf.ed.template.BfTemplatePreferencePage"
             id="org.birenheide.bf.Templates"
             name="Templates">
       </page>
