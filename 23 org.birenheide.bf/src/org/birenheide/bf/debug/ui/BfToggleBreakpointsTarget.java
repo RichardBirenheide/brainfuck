@@ -37,28 +37,20 @@ public class BfToggleBreakpointsTarget implements IToggleBreakpointsTarget {
 	@Override
 	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection)
 			throws CoreException {
-		//TODO Handle breakpoints at deleted regions at end of document correctly.
 		if (part instanceof BfEditor) {
 			BfEditor editor = (BfEditor) part;
+			if (editor.isDirty()) {
+				return;
+			}
 			ITextSelection sel = (ITextSelection) selection;
 			IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
 			int location = sel.getOffset();
 			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 			int line = -1;
+			char charAtLocation = 0;
 			try {
 				line = document.getLineOfOffset(location);
-				while (location < document.getLength()) {
-					if (document.getLineOfOffset(location) != line) {
-						return;
-					}
-					char c = document.getChar(location);
-//					System.out.println(new String(new char[]{c}));
-					if (BrainfuckInterpreter.isReservedChar(c)) {
-						break;
-					}
-					location++;
-				}
-				line = document.getLineOfOffset(location);
+				charAtLocation = document.getChar(location);
 			} 
 			catch (BadLocationException e) {
 				return;
@@ -70,15 +62,13 @@ public class BfToggleBreakpointsTarget implements IToggleBreakpointsTarget {
 				for (IBreakpoint bp : bpm.getBreakpoints(BfDebugTarget.MODEL_IDENTIFIER)) {
 					if (bp instanceof BfBreakpoint) {
 						BfBreakpoint breakpoint = (BfBreakpoint) bp;
-//						System.out.println(breakpoint + ": " + location);
-						if (breakpoint.getMarker().getResource().equals(file) && breakpoint.getCharStart() >= location) {
+						if (breakpoint.getMarker().getResource().equals(file) && breakpoint.getCharStart() == location) {
 							breakpoint.delete();
 							deleted = true;
 						}
 					}
 				}
-				if (!deleted) {
-					
+				if (!deleted && BrainfuckInterpreter.isReservedChar(charAtLocation)) {
 					BfBreakpoint bp = new BfBreakpoint(file, location, line);
 					DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(bp);
 				}

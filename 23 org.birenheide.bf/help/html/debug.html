@@ -52,10 +52,19 @@
 	is in many places depicted with <code>ip=&lt;location&gt;</code> (<code>ip</code> 
 	standing for <b><i>i</i></b>nstruction <b><i>p</i></b>ointer).
 	</p>
+	<p class="nofloat">
+	Breakpoints can be set in the code either by context menu or by double click in the vertical ruler 
+	(ruler on the left). The breakpoint will be set at the cursor location or at the beginning of a 
+	line (depending on where the toggle action is initiated). There can be more than one breakpoint
+	per line, toggling breakpoints (double click in the vertical ruler) will toggle the breakpoint
+	at the actual cursor position or at the beginning of line, when the cursor is in a different line. 
+	If the cursor is at a different position than an actual breakpoint
+	in the same line, a new breakpoint will be created. Breakpoints can only be set or removed 
+	from saved editors.</p>
 	<img alt="Breakpoint visualization in code" src="./images/debug/breakpoint.png" class="floatImage">
 	<p>
-	As well Brainfuck breakpoints come with an own annotation type. Its default shows the exact location of a breakpoint
-	as vertical line. The visualization can be changed under
+	As well Brainfuck breakpoints come with an own annotation type. Its default shows the exact location 
+	of a breakpoint	as vertical line. The visualization can be changed under
 	<a href='javascript:liveAction(
 	"org.birenheide.bf", 
 	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
@@ -147,6 +156,7 @@
 	</p>
 	
 	<h3 class="nofloat">Hot Code Replacement</h3>
+	<p>
 	When the file underlying an active debug session is changed, the code is (optionally) replaced with the new
 	code. The location of the instruction pointer or the memory pointer remain unchanged. Keep in mind that this
 	property may lead to different behavior of the program when freshly started.
@@ -155,7 +165,8 @@
 	"org.birenheide.bf", 
 	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
 	"org.birenheide.bf.Debug")'>Debug Preferences</a>.<br>
-	In each of the cases the Debug Target in the Debug View is marked appropriately.
-	
+	In each of the cases the Debug Target in the Debug View is marked appropriately either as code being
+	replaced or as being out-of-sync.
+	</p>
 </body>
 </html>
