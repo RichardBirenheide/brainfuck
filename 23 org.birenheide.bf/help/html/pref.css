@@ -5,3 +5,11 @@ code.key {
 code.comment { 
 	color:#00A000; 
 }
+
+img.floatImage {
+	float:left; margin-right:1em; margin-top: 0.5em; margin-bottom: 1em;  clear: both;
+}
+
+.nofloat {
+	clear: both;
+}

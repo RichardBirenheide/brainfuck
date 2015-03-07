@@ -2,13 +2,160 @@
 
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" charset="ISO-8859-1" type="text/css">
-	<title>Debugger</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" charset="ISO-8859-1" type="text/css">
+<link rel="stylesheet" href="./pref.css" charset="UTF-8" type="text/css">
+
+<script language="JavaScript" src="PLUGINS_ROOT/org.eclipse.help/livehelp.js"></script>
+<title>Debugger</title>
 </head>
 
 <body>
-<h1>Brainfuck Run/Debug Support</h1>
-Please enter your text here.
+	<h1>Brainfuck Run/Debug Support</h1>
+	<p>
+	Brainfuck files can be started from the Run or the context menu "Run as -> Brainfuck Program".
+	Debugging can be initiated the same way.
+	</p>
+	<h2>Run/Debug Configuration</h2>
+	<p>
+	Run or debug configurations can be created or edited manually. The following tabs allow
+	customizing the configuration.
+	</p>
+	<h3>Main Tab</h3>
+	<img alt="Debug configuration main tab" src="./images/debug/debugConfigMain.png">
+	<ul>
+	<li><b>Project</b>: Specifies the the project location of a Brainfuck file to run or debug.</li>
+	<li><b>File</b>: Specifies the Brainfuck file.</li>
+	<li><b>Input File</b>: The Brainfuck Interpreter can be fed data either from the console
+	or through a file. A file can be specified here.</li>
+	<li><b>Output File</b>: The Brainfuck Interpreters output can be sent to the console or into a file.
+	The file can be specified here. Brainfuck can write only bytes to output. To enable the console to write 
+	characters outside the 7-bit range correctly, bytes must not be flushed immediately. The debugger is able
+	to flush bytes only after a linebreak to accomplish correct encoding (see also Common Tab). As this might lead
+	to characters not showing up immediately after they are written while debugging, one can specify for debug mode to write
+	out any bytes immediately by checking the "Auto Flush" check box. This setting is ignored in Run mode.  
+	</ul>
+	<h3>Common Tab</h3>
+	<img alt="Debug configuration common tab" src="./images/debug/debugConfigCommon.png">
+	<p>
+	The settings presented are common to most debug/run configurations. Particularly important for Brainfuck
+	are the encoding settings as they determine how input and output are displayed, read or written. Use the
+	marked settings if you are reading or writing with encodings differing from the platform settings.
+	</p> 
+	<h2>Breakpoints</h2>
+	The Brainfuck interpreter supports two types of breakpoints, namely breakpoints at specific instructions and
+	watchpoints (memory breakpoints). 
+	<h3>Instruction Pointer Breakpoints</h3>
+	<img alt="Breakpoints in Breakpoint View" src="./images/debug/breakpointView.png"  class="floatImage">
+	<p>
+	As Brainfuck is not line oriented breakpoints are being set at specific instructions. The exact location
+	is in many places depicted with <code>ip=&lt;location&gt;</code> (<code>ip</code> 
+	standing for <b><i>i</i></b>nstruction <b><i>p</i></b>ointer).
+	</p>
+	<img alt="Breakpoint visualization in code" src="./images/debug/breakpoint.png" class="floatImage">
+	<p>
+	As well Brainfuck breakpoints come with an own annotation type. Its default shows the exact location of a breakpoint
+	as vertical line. The visualization can be changed under
+	<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations")'> 
+	"Window-&gt;Preferences-&gt;General-&gt;Editors-&gt;Text Editors-&gt;Annotations"</a> without affecting the
+	visualization of other workbench breakpoints. The debugger will halt <i>before</i> the instruction at the
+	instruction pointer is executed, analogous to line breakpoints in other languages. Breakpoints which are active 
+	in a running debugging session are marked with a check annotation to indicate that the interpreter has recognized
+	this breakpoint. This makes it easy to tell active breakpoints from inactive ones in the breakpoint view.
+	After the debugger has stopped, execution can either be resumed or one can step through the code.
+	</p>
+	<h3 class="nofloat">Watchpoints</h3>
+	<img alt="Watchpoint in Breakpoint View" src="./images/debug/watchpoint01.png" class="floatImage">
+	<p>
+	Watchpoints halt the application when the memory state of a specified memory cell is changed. Beside memory
+	location one can specify different conditions for halting.  
+	</p>
+	<ul class="nofloat">
+	<li>Suspend on access: This is synonym for when the memory pointer is set to the specified memory cell.
+	The interpreter is stopped in this case. It will stop again only if the memory pointer is moved away from 
+	the cell and then moved to the cell location again.</li>
+	<li>Suspend value: any. In this case the interpreter stops on every change at the specified memory location.</li>
+	<li>Suspend value: a specified value. In this case the interpreter stops when the value at the specified memory
+	location is changed to the value specified. It is permissible to define multiple watchpoints for the same
+	memory location with different values specified.</li>
+	</ul>
+	<p>
+	Access and modification properties can be changed from the watchpoints context menu in the Breakpoints View.
+	</p>
+	
+	<h2>Displaying Debugging Information</h2>
+	The two most prominent informations one needs are the <b><i>i</i></b>nstruction <b><i>p</i></b>ointer (ip)
+	and the <b><i>m</i></b>emory <b><i>p</i></b>ointer (mp) location.<br>
+	The instruction pointer value is shown in decimal to ease finding the location in the source code (a text hover
+	in the source code shows locations as well). The memory pointer and its values are displayed in hexadecimal.
+	All values in hexadecimal are preceded by <code>0x..</code> followed be the value.
+	<h3>Debug View</h3>
+	<img alt="Debug View" src="./images/debug/debugView01.png" class="floatImage">
+	<p>
+	The debug view shows comprehensive information when the interpreter halts. The debug target and process
+	show the file name and optionally some additional information (when code has been replaced).
+	The single stack trace (Brainfuck does not support method calls, obviously) shows information about the actual
+	<b><i>i</i></b>nstruction <b><i>p</i></b>ointer in decimal (to ease locating the place in the source code) and
+	the actual <b><i>m</i></b>emory <b><i>p</i></b>ointer location in hexadecimal.
+	</p>
+
+	<h3 class="nofloat">Memory View</h3>
+	<img alt="Memory View" src="./images/debug/memoryView01.png">
+	<p>
+	The memory contents of the Brainfuck application is shown in the memory view. The view should come up
+	automatically when the debugger halts. Otherwise it can be opened under 
+	<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActivHelpOpenViewAction",
+	"org.eclipse.debug.ui.MemoryView")'> 
+	"Window->Show View->Other->Debug->Memory".</a>
+	The actual location of the memory pointer is highlighted with light gray background. As the interpreter
+	comes with dynamically growing memory space a new rendering is created whenever the size of the memory
+	is increased.	 	
+	</p>
+	<p>
+	The memory view is the Eclipse standard memory view which comes with the debug infrastructure. Therefore one
+	can visualize the memory locations using:
+	</p>
+	<ul>
+	<li>Other memory renderings such as the default ASCII rendering. Only the Brainfuck Memory rendering will show
+	the location of the memory pointer, however.</li>
+	<li>Customized memory ranges. The default will show always the entire addressable range. When allocating
+	large amounts of memory this may be not desirable.</li>
+	</ul>
+	<img alt="Memory View Settings" src="./images/debug/memoryView02.png" class="floatImage">
+	<p>
+	The default visualization can be hard to parse therefore the settings depicted here are recommended
+	which correspond to a final picture as shown above. Once the memory view contains an active session when
+	the debugger stops it can be set from the context menu under "Format...".
+	</p>
+	<h3 class="nofloat">Instruction Pointer</h3>
+	<img alt="Instruction Pointer" src="./images/debug/instructionpointer01.png" class="floatImage">
+	<p>
+	The instruction pointer is displayed in the code with an own annotation whichs appearance can be set in
+	<a href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.eclipse.ui.editors.preferencePages.Annotations")'> 
+	"Window-&gt;Preferences-&gt;General-&gt;Editors-&gt;Text Editors-&gt;Annotations"</a> 
+	as well. The default displays the instruction at which the execution halts with a blue background. 
+	The highlighted instruction is the one which will be executed next. Hovering the annotation will 
+	display more detailed information.
+	</p>
+	
+	<h3 class="nofloat">Hot Code Replacement</h3>
+	When the file underlying an active debug session is changed, the code is (optionally) replaced with the new
+	code. The location of the instruction pointer or the memory pointer remain unchanged. Keep in mind that this
+	property may lead to different behavior of the program when freshly started.
+	Hot Code Replacement can be switched off in the 
+	<a name="DebugPreferences" href='javascript:liveAction(
+	"org.birenheide.bf", 
+	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.birenheide.bf.Debug")'>Debug Preferences</a>.<br>
+	In each of the cases the Debug Target in the Debug View is marked appropriately.
+	
 </body>
 </html>

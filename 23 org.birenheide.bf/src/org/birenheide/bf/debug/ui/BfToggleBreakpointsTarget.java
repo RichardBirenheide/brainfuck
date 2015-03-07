@@ -37,15 +37,20 @@ public class BfToggleBreakpointsTarget implements IToggleBreakpointsTarget {
 	@Override
 	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection)
 			throws CoreException {
+		//TODO Handle breakpoints at deleted regions at end of document correctly.
 		if (part instanceof BfEditor) {
 			BfEditor editor = (BfEditor) part;
 			ITextSelection sel = (ITextSelection) selection;
 			IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
 			int location = sel.getOffset();
-			int line = -1;
 			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+			int line = -1;
 			try {
+				line = document.getLineOfOffset(location);
 				while (location < document.getLength()) {
+					if (document.getLineOfOffset(location) != line) {
+						return;
+					}
 					char c = document.getChar(location);
 //					System.out.println(new String(new char[]{c}));
 					if (BrainfuckInterpreter.isReservedChar(c)) {
@@ -59,13 +64,14 @@ public class BfToggleBreakpointsTarget implements IToggleBreakpointsTarget {
 				return;
 			}
 			
-			if (location >= 0 && location < document.getLength()) {
+			if (location >= 0 && location <= document.getLength()) {
 				IBreakpointManager bpm = DebugPlugin.getDefault().getBreakpointManager();
 				boolean deleted = false;
 				for (IBreakpoint bp : bpm.getBreakpoints(BfDebugTarget.MODEL_IDENTIFIER)) {
 					if (bp instanceof BfBreakpoint) {
 						BfBreakpoint breakpoint = (BfBreakpoint) bp;
-						if (breakpoint.getMarker().getResource().equals(file) && breakpoint.getCharStart() == location) {
+//						System.out.println(breakpoint + ": " + location);
+						if (breakpoint.getMarker().getResource().equals(file) && breakpoint.getCharStart() >= location) {
 							breakpoint.delete();
 							deleted = true;
 						}
