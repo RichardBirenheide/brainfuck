@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ed.template.BfTemplateContext;
 import org.birenheide.bf.ed.template.BfTemplateProposal;
 import org.birenheide.bf.ed.template.ParametrizedTemplateTypeDescriptor;

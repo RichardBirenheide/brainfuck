@@ -3,7 +3,7 @@ package org.birenheide.bf.ui.wizard;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ed.EditorConstants;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;

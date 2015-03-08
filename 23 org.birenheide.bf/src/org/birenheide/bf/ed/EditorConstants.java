@@ -1,6 +1,6 @@
 package org.birenheide.bf.ed;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 
 public interface EditorConstants {
 

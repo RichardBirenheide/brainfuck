@@ -1,13 +1,13 @@
 package org.birenheide.bf.ed;
 
-import static org.birenheide.bf.BfActivator.BF_PROBLEM_MARKER_ID;
+import static org.birenheide.bf.core.BfActivator.BF_PROBLEM_MARKER_ID;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ed.template.BfTemplatePreferencePage;
 import org.birenheide.bf.ui.HelpContext;
 import org.eclipse.core.resources.IFile;

@@ -1,6 +1,6 @@
 package org.birenheide.bf.ed.template;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ui.HelpContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.templates.Template;

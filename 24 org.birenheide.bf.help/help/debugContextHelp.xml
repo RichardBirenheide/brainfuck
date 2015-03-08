@@ -1,0 +1,6 @@
+<contexts>
+   <context id="debug">
+      <description>This configuration type allows you to run/debug a Brainfuck File</description>
+      <topic href="help/html/debug.html" label="Brainfuck Run/Debug Support"/>
+   </context>
+</contexts>

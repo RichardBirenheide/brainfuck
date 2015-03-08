@@ -1,13 +1,13 @@
 package org.birenheide.bf.ed;
 
-import static org.birenheide.bf.BfActivator.BUNDLE_SYMBOLIC_NAME;
+import static org.birenheide.bf.core.BfActivator.BUNDLE_SYMBOLIC_NAME;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;

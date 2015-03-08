@@ -1,6 +1,5 @@
 package org.birenheide.bf.help;
 
-import org.birenheide.bf.BfActivator;
 import org.eclipse.help.ILiveHelpAction;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -30,7 +29,7 @@ public class ActivHelpOpenViewAction implements ILiveHelpAction {
 						window.getActivePage().showView(viewId);
 					} 
                      catch (PartInitException ex) {
-						BfActivator.getDefault().logError("View could not be opened: " + viewId, ex);
+						HelpActivator.getDefault().logError("View could not be opened: " + viewId, ex);
 					}
 				}
 			}

@@ -1,6 +1,6 @@
 package org.birenheide.bf.ed.template;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 
 public enum ParametrizedTemplateTypeDescriptor {
 	

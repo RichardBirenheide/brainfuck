@@ -1,6 +1,6 @@
 package org.birenheide.bf.ui.wizard;
 
-import org.birenheide.bf.BfActivator;
+import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ed.EditorConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;

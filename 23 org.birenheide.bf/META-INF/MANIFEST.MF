@@ -20,5 +20,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.10.0",
 Bundle-ClassPath: lib/interpreter.jar,
  .
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: org.birenheide.bf.BfActivator
-Export-Package: org.birenheide.bf;x-friends:="org.birenheide.bf.help"
+Bundle-Activator: org.birenheide.bf.core.BfActivator
+Export-Package: org.birenheide.bf;x-friends:="org.birenheide.bf.help,org.birenheide.bf.debug",
+ org.birenheide.bf.ed;x-friends:="org.birenheide.bf.debug"

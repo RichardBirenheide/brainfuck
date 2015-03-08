@@ -1,8 +1,4 @@
 <contexts>
-   <context id="debug">
-      <description>This configuration type allows you to run/debug a Brainfuck File</description>
-      <topic href="help/html/debug.html" label="Brainfuck Run/Debug Support"/>
-   </context>
    <context id="editor" title="Brainfuck Editor">
       <description>The Brainfuck Editor allows you to edit Brainfuck (*.bf) files.</description>
       <topic href="help/html/editor.html" label="Brainfuck Editor"/>

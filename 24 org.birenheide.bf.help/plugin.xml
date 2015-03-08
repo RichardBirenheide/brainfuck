@@ -4,7 +4,12 @@
    <extension
          point="org.eclipse.help.contexts">
       <contexts
-            file="help/bfContextHelp.xml">
+            file="help/bfContextHelp.xml"
+            plugin="org.birenheide.bf">
+      </contexts>
+      <contexts
+            file="help/debugContextHelp.xml"
+            plugin="org.birenheide.bf.debug">
       </contexts>
    </extension>
    <extension
