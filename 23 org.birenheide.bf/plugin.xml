@@ -452,6 +452,9 @@
          <viewShortcut
                id="org.eclipse.ui.views.ProblemView">
          </viewShortcut>
+         <showInPart
+               id="org.eclipse.ui.navigator.ProjectExplorer">
+         </showInPart>
       </perspectiveExtension>
    </extension>
    <extension
@@ -623,6 +626,36 @@
             class="org.birenheide.bf.ed.BfDocSetupParticipant"
             contentTypeId="org.birenheide.bf.brainfuck">
       </participant>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:common.new.menu?before=new">
+         <command
+               commandId="org.birenheide.bf.newFileWizard"
+               icon="icons/brainfuck.gif"
+               label="Brainfuck File"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeWorkbenchWindow.activePerspective">
+                  <equals
+                        value="org.birenheide.bf.Brainfuck">
+                  </equals>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.birenheide.bf.ui.wizard.NewFileWizardHandler"
+            id="org.birenheide.bf.newFileWizard"
+            name="New Brainfuck File...">
+      </command>
    </extension>
 
 </plugin>
