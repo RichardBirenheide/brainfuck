@@ -6,17 +6,14 @@ import org.birenheide.bf.debug.ui.BfUIListenerContributor;
 import org.birenheide.bf.ed.template.BfTemplateType;
 import org.birenheide.bf.ed.template.ParametrizedTemplateTypeDescriptor;
 import org.birenheide.bf.ui.BfImages;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-public class BfActivator extends AbstractUIPlugin {
+public class BfActivator extends AbstractBfActivator {
 	
 	public static final String BUNDLE_SYMBOLIC_NAME = "org.birenheide.bf";
 	
@@ -68,45 +65,14 @@ public class BfActivator extends AbstractUIPlugin {
 		return this.registry;
 	}
 	
-    public void logError(String message, Throwable cause) {
-
-        this.log(message, cause, IStatus.ERROR);
-    }
-
-    public void logInfo(String message, Throwable cause) {
-
-        this.log(message, cause, IStatus.INFO);
-    }
-
-    public void logWarning(String message, Throwable cause) {
-
-        this.log(message, cause, IStatus.WARNING);
-    }
-
     @Override
 	protected void initializeImageRegistry(ImageRegistry reg) {
 		BfImages.initializeImageRegistry(reg);
 	}
 
-	private void log(String message, Throwable cause, int severity) {
-
-        String pluginId = this.getBundle() != null ? this.getBundle().getSymbolicName() : BUNDLE_SYMBOLIC_NAME;
-        if (message == null) {
-            message = cause != null ? cause.getMessage() : "";
-        }
-        if (cause != null) {
-            this.getLog().log(new Status(severity, pluginId, message, cause));
-            if (this.isDebugging()) {
-                System.err.println("Message: " + message);
-                cause.printStackTrace();
-            }
-        }
-        else {
-            this.getLog().log(new Status(severity, pluginId, message));
-            if (this.isDebugging()) {
-                System.err.println("Message: " + message);
-            }
-        }
-    }
+	@Override
+	protected String getDefaultPluginId() {
+		return BUNDLE_SYMBOLIC_NAME;
+	}
 	
 }

@@ -533,22 +533,6 @@
       </super>
    </extension>
    <extension
-         point="org.eclipse.help.toc">
-      <toc
-            file="help/bfToc.xml"
-            primary="true">
-      </toc>
-      <toc
-            file="help/toc.xml">
-      </toc>
-   </extension>
-   <extension
-         point="org.eclipse.help.contexts">
-      <contexts
-            file="help/bfContextHelp.xml">
-      </contexts>
-   </extension>
-   <extension
          point="org.eclipse.debug.core.statusHandlers">
       <statusHandler
             class="org.birenheide.bf.debug.ui.ErrorDialogStatusHandler"

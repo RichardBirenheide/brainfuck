@@ -1,4 +1,4 @@
-package org.birenheide.bf.ui;
+package org.birenheide.bf.help;
 
 import org.birenheide.bf.BfActivator;
 import org.eclipse.help.ILiveHelpAction;

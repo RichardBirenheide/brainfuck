@@ -66,8 +66,8 @@
 	As well Brainfuck breakpoints come with an own annotation type. Its default shows the exact location 
 	of a breakpoint	as vertical line. The visualization can be changed under
 	<a href='javascript:liveAction(
-	"org.birenheide.bf", 
-	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.birenheide.bf.help", 
+	"org.birenheide.bf.help.ActiveHelpOpenPreferencePageAction",
 	"org.eclipse.ui.editors.preferencePages.Annotations")'> 
 	"Window-&gt;Preferences-&gt;General-&gt;Editors-&gt;Text Editors-&gt;Annotations"</a> without affecting the
 	visualization of other workbench breakpoints. The debugger will halt <i>before</i> the instruction at the
@@ -117,8 +117,8 @@
 	The memory contents of the Brainfuck application is shown in the memory view. The view should come up
 	automatically when the debugger halts. Otherwise it can be opened under 
 	<a href='javascript:liveAction(
-	"org.birenheide.bf", 
-	"org.birenheide.bf.ui.ActivHelpOpenViewAction",
+	"org.birenheide.bf.help", 
+	"org.birenheide.bf.help.ActivHelpOpenViewAction",
 	"org.eclipse.debug.ui.MemoryView")'> 
 	"Window->Show View->Other->Debug->Memory".</a>
 	The actual location of the memory pointer is highlighted with light gray background. As the interpreter
@@ -146,8 +146,8 @@
 	<p>
 	The instruction pointer is displayed in the code with an own annotation whichs appearance can be set in
 	<a href='javascript:liveAction(
-	"org.birenheide.bf", 
-	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.birenheide.bf.help", 
+	"org.birenheide.bf.help.ActiveHelpOpenPreferencePageAction",
 	"org.eclipse.ui.editors.preferencePages.Annotations")'> 
 	"Window-&gt;Preferences-&gt;General-&gt;Editors-&gt;Text Editors-&gt;Annotations"</a> 
 	as well. The default displays the instruction at which the execution halts with a blue background. 
@@ -162,8 +162,8 @@
 	property may lead to different behavior of the program when freshly started.
 	Hot Code Replacement can be switched off in the 
 	<a name="DebugPreferences" href='javascript:liveAction(
-	"org.birenheide.bf", 
-	"org.birenheide.bf.ui.ActiveHelpOpenPreferencePageAction",
+	"org.birenheide.bf.help", 
+	"org.birenheide.bf.help.ActiveHelpOpenPreferencePageAction",
 	"org.birenheide.bf.Debug")'>Debug Preferences</a>.<br>
 	In each of the cases the Debug Target in the Debug View is marked appropriately either as code being
 	replaced or as being out-of-sync.
