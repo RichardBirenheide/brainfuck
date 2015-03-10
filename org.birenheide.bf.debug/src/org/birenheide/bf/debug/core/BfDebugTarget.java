@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.birenheide.bf.debug.DbgActivator;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -140,13 +141,26 @@ public class BfDebugTarget extends BfDebugElement implements IDebugTarget {
 			if (bp == null) {
 				return;
 			}
-			int location = bp.getCharStart();
+			if (delta.getKind() != IResourceDelta.CHANGED) {
+				DbgActivator.getDefault().logError("Unexpected marker delta: " + delta, null);
+				return;
+			}
+		
+			int newLocation = bp.getCharStart();
+			int oldLocation = delta.getAttribute(IMarker.CHAR_START, newLocation);
+			
 			if (bp.isEnabled() && DebugPlugin.getDefault().getBreakpointManager().isEnabled()) {
-				this.process.getInterpreter().addBreakpoint(location);
-				this.addInstalledBreakpoint(bp);
+				if (!this.installedBreakpoints.contains(breakpoint)) {
+					this.process.getInterpreter().addBreakpoint(newLocation);
+					this.addInstalledBreakpoint(bp);
+				}
+				else if (newLocation != oldLocation) {
+					this.process.getInterpreter().removeBreakpoint(oldLocation);
+					this.process.getInterpreter().addBreakpoint(newLocation);
+				}
 			}
 			else {
-				this.process.getInterpreter().removeBreakpoint(location);
+				this.process.getInterpreter().removeBreakpoint(oldLocation);
 				this.removeInstalledBreakpoint(bp);
 			}
 		}
