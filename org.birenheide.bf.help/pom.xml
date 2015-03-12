@@ -13,6 +13,6 @@
 
 	<artifactId>org.birenheide.bf.help</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<name>Brainfuck Debug Plugin</name>
+	<name>Brainfuck Help Plugin</name>
 
 </project>
