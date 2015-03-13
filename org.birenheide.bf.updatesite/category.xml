@@ -3,6 +3,9 @@
    <feature url="features/org.birenheide.bf.feature_0.0.2.qualifier.jar" id="org.birenheide.bf.feature" version="0.0.2.qualifier">
       <category name="org.birenheide.bf"/>
    </feature>
+   <feature url="features/org.birenheide.bf.feature_0.0.2.qualifier-sources-feature.jar" id="org.birenheide.bf.feature.source" version="0.0.2.qualifier">
+      <category name="org.birenheide.bf"/>
+   </feature>
    <category-def name="org.birenheide.bf" label="Brainfuck Tools">
       <description>
          Brainfuck editing and run/debug support.
