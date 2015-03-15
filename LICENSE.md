@@ -1,28 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="org.birenheide.bf.feature"
-      label="%feature.label"
-      version="0.0.2.qualifier"
-      provider-name="%feature.vendor">
-
-   <description>
-      Brainfuck editing and run/debug support.
-   </description>
-
-   <copyright>
-      (c) Copyright Richard Birenheide and others 2015.  All rights reserved.
-   </copyright>
-
-   <license url="http://www.eclipse.org/legal/epl-v10.html">
-      Eclipse Public License - v 1.0
+Eclipse Public License - v 1.0
 
 THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC
-LICENSE (&quot;AGREEMENT&quot;). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM
-CONSTITUTES RECIPIENT&apos;S ACCEPTANCE OF THIS AGREEMENT.
+LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM
+CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
 
 1. DEFINITIONS
 
-&quot;Contribution&quot; means:
+"Contribution" means:
 
 a) in the case of the initial Contributor, the initial code and documentation
    distributed under this Agreement, and
@@ -31,23 +15,23 @@ b) in the case of each subsequent Contributor:
    ii) additions to the Program;
 
    where such changes and/or additions to the Program originate from and are
-   distributed by that particular Contributor. A Contribution &apos;originates&apos;
+   distributed by that particular Contributor. A Contribution 'originates'
    from a Contributor if it was added to the Program by such Contributor
-   itself or anyone acting on such Contributor&apos;s behalf. Contributions do not
+   itself or anyone acting on such Contributor's behalf. Contributions do not
    include additions to the Program which: (i) are separate modules of
    software distributed in conjunction with the Program under their own
    license agreement, and (ii) are not derivative works of the Program.
 
-&quot;Contributor&quot; means any person or entity that distributes the Program.
+"Contributor" means any person or entity that distributes the Program.
 
-&quot;Licensed Patents&quot; mean patent claims licensable by a Contributor which are
+"Licensed Patents" mean patent claims licensable by a Contributor which are
 necessarily infringed by the use or sale of its Contribution alone or when
 combined with the Program.
 
-&quot;Program&quot; means the Contributions distributed in accordance with this
+"Program" means the Contributions distributed in accordance with this
 Agreement.
 
-&quot;Recipient&quot; means anyone who receives the Program under this Agreement,
+"Recipient" means anyone who receives the Program under this Agreement,
 including all Contributors.
 
 2. GRANT OF RIGHTS
@@ -76,7 +60,7 @@ including all Contributors.
      hereunder, each Recipient hereby assumes sole responsibility to secure
      any other intellectual property rights needed, if any. For example, if a
      third party patent license is required to allow Recipient to distribute
-     the Program, it is Recipient&apos;s responsibility to acquire that license
+     the Program, it is Recipient's responsibility to acquire that license
      before distributing the Program.
   d) Each Contributor represents that to its knowledge it has sufficient
      copyright rights in its Contribution, if any, to grant the copyright
@@ -122,9 +106,9 @@ intended to facilitate the commercial use of the Program, the Contributor who
 includes the Program in a commercial product offering should do so in a manner
 which does not create potential liability for other Contributors. Therefore,
 if a Contributor includes the Program in a commercial product offering, such
-Contributor (&quot;Commercial Contributor&quot;) hereby agrees to defend and indemnify
-every other Contributor (&quot;Indemnified Contributor&quot;) against any losses,
-damages and costs (collectively &quot;Losses&quot;) arising from claims, lawsuits and
+Contributor ("Commercial Contributor") hereby agrees to defend and indemnify
+every other Contributor ("Indemnified Contributor") against any losses,
+damages and costs (collectively "Losses") arising from claims, lawsuits and
 other legal actions brought by a third party against the Indemnified
 Contributor to the extent caused by the acts or omissions of such Commercial
 Contributor in connection with its distribution of the Program in a commercial
@@ -141,7 +125,7 @@ For example, a Contributor might include the Program in a commercial product
 offering, Product X. That Contributor is then a Commercial Contributor. If
 that Commercial Contributor then makes performance claims, or offers
 warranties related to Product X, those performance claims and warranties are
-such Commercial Contributor&apos;s responsibility alone. Under this section, the
+such Commercial Contributor's responsibility alone. Under this section, the
 Commercial Contributor would have to defend claims against the other
 Contributors related to those performance claims and warranties, and if a
 court requires any other Contributor to pay any damages as a result, the
@@ -150,7 +134,7 @@ Commercial Contributor must pay those damages.
 5. NO WARRANTY
 
 EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, THE PROGRAM IS PROVIDED ON AN
-&quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR
 IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE,
 NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each
 Recipient is solely responsible for determining the appropriateness of using
@@ -182,15 +166,15 @@ necessary to make such provision valid and enforceable.
 If Recipient institutes patent litigation against any entity (including a
 cross-claim or counterclaim in a lawsuit) alleging that the Program itself
 (excluding combinations of the Program with other software or hardware)
-infringes such Recipient&apos;s patent(s), then such Recipient&apos;s rights granted
+infringes such Recipient's patent(s), then such Recipient's rights granted
 under Section 2(b) shall terminate as of the date such litigation is filed.
 
-All Recipient&apos;s rights under this Agreement shall terminate if it fails to
+All Recipient's rights under this Agreement shall terminate if it fails to
 comply with any of the material terms or conditions of this Agreement and does
 not cure such failure in a reasonable period of time after becoming aware of
-such noncompliance. If all Recipient&apos;s rights under this Agreement terminate,
+such noncompliance. If all Recipient's rights under this Agreement terminate,
 Recipient agrees to cease use and distribution of the Program as soon as
-reasonably practicable. However, Recipient&apos;s obligations under this Agreement
+reasonably practicable. However, Recipient's obligations under this Agreement
 and any licenses granted by Recipient relating to the Program shall continue
 and survive.
 
@@ -217,27 +201,3 @@ intellectual property laws of the United States of America. No party to this
 Agreement will bring a legal action under this Agreement more than one year
 after the cause of action arose. Each party waives its rights to a jury trial in
 any resulting litigation.
-   </license>
-
-   <plugin
-         id="org.birenheide.bf"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.birenheide.bf.help"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.birenheide.bf.debug"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-</feature>
