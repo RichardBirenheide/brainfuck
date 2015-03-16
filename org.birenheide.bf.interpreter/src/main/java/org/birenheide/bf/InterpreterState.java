@@ -1,8 +1,23 @@
 package org.birenheide.bf;
 
+/**
+ * Represents the state of the interpreter.
+ * The state may only be valid for the lifetime of the call it is passed
+ * into as parameter or as long as the interpreter is suspended. 
+ * @author Richard Birenheide
+ *
+ */
 public interface InterpreterState {
 
+	/**
+	 * Retrieves the position of the instruction pointer.
+	 * @return the index of the instruction pointer, zero-based.
+	 */
 	public int instructionPointer();
+	/**
+	 * Retrieves the position of the data pointer.
+	 * @return the index of the data pointer, zero-based.
+	 */
 	public int dataPointer();
 	/**
 	 * Retrieves a snapshot of the data storage.

@@ -1,5 +1,10 @@
 package org.birenheide.bf;
 
+/**
+ * Represents a watchpoint for data locations.
+ * @author Richard Birenheide
+ *
+ */
 public interface MemoryWatchpoint {
 
 	/**
