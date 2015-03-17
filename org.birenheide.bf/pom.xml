@@ -14,7 +14,7 @@
 	<artifactId>org.birenheide.bf</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<name>Brainfuck Editor Plugin</name>
-	
+
 	<properties>
 		<interpreter.jar>interpreter.jar</interpreter.jar>
 	</properties>
@@ -52,7 +52,7 @@
 						<goals>
 							<goal>copy</goal>
 						</goals>
-<!-- 						<phase>packaging</phase> -->
+						<!-- <phase>packaging</phase> -->
 						<configuration>
 							<artifactItems>
 								<artifactItem>
@@ -64,6 +64,49 @@
 									<destFileName>${interpreter.jar}</destFileName>
 								</artifactItem>
 							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+						<id>unpack</id>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<!-- <phase>packaging</phase> -->
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.birenheide.bf</groupId>
+									<artifactId>interpreter</artifactId>
+									<type>jar</type>
+									<classifier>sources</classifier>
+									<overWrite>true</overWrite>
+									<!-- <outputDirectory>${basedir}/lib</outputDirectory> -->
+									<!-- <destFileName>sources-${interpreter.jar}</destFileName> -->
+									<excludes>META-INF/*.*,META-INF</excludes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+						<configuration>
+							<additionalFileSets>
+								<fileSet>
+									<directory>${project.build.directory}/dependency/</directory>
+									<includes>
+										<include>**/*</include>
+									</includes>
+								</fileSet>
+							</additionalFileSets>
 						</configuration>
 					</execution>
 				</executions>
