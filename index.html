@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>Brainfuck by RichardBirenheide</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Brainfuck</h1>
+        <h2></h2>
+
+        <section id="downloads">
+          <a href="https://github.com/RichardBirenheide/brainfuck/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/RichardBirenheide/brainfuck/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/RichardBirenheide/brainfuck" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a id="brainfuck-interpreter-and-eclipse-editingdebug-support" class="anchor" href="#brainfuck-interpreter-and-eclipse-editingdebug-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Brainfuck interpreter and Eclipse editing/debug support.</h1>
+
+<p>Brainfuck interpreter written in Java. The interpreter supports in process
+debugging, i.e. the debugger must run in the same Java process.</p>
+
+<p>Eclipse feature comprising of an editor and a debug plugin.  </p>
+
+<h2>
+<a id="brainfuck-interpreter" class="anchor" href="#brainfuck-interpreter" aria-hidden="true"><span class="octicon octicon-link"></span></a>Brainfuck interpreter</h2>
+
+<p>Characteristics:</p>
+
+<ul>
+<li><p><strong>Size of internal memory</strong><br>
+The size of the internal memory (navigable with &lt; and &gt;) will increase dynamically when the memory pointer exceeds the current size of the memory. This will not be boundary checked and stops when the JVM heap memory is exhausted. Starting the JVM with larger memory boundaries can increase the available memory.
+When running in Eclipse, the interpreter is run within Eclipses JVM therefore the constraints apply with which Eclipse is run. </p></li>
+<li><p><strong>Wrapping</strong><br>
+The memory bytes will wrap on + and -. </p></li>
+<li>
+<p><strong>Running the standalone Interpreter</strong><br>
+java org.birenheide.bf.Main [in=&lt;filename&gt;] [out=&lt;filename&gt;] [dbg=&lt;filename&gt;] &lt;filename&gt;  </p>
+
+<ul>
+<li>in: name of a file to read from in the brainfuck program; will read from command line if omitted<br>
+</li>
+<li>out: name of a file to write to in the brainfuck program; will write to command line if omitted<br>
+</li>
+<li>dbg: name of a file containing debug information; no debugging, if omitted. See debug.properties for usage<br>
+</li>
+<li>filename: mandatory file containing the brainfuck program<br>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>See also: <a href="http://esolangs.org/wiki/Brainfuck">Brainfuck on Esolang Wiki</a></p>
+
+<h2>
+<a id="eclipse-editing-and-rundebug-support" class="anchor" href="#eclipse-editing-and-rundebug-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eclipse editing and run/debug support</h2>
+
+<ul>
+<li><p><strong>Editing</strong><br>
+Editor support with syntax highlighting and template support. Templates are triggered from code completion.
+Templates can operate on number tuples separated by semicolon to enable easy template customization.</p></li>
+<li><p><strong>Debugging</strong><br>
+Supports breakpoints, watchpoints and stepping. </p></li>
+</ul>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
