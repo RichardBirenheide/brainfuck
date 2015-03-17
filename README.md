@@ -33,3 +33,6 @@ Templates can operate on number tuples separated by semicolon to enable easy tem
 
 * **Debugging**  
 Supports breakpoints, watchpoints and stepping. 
+
+* [Eclipse Update Site](http://richardbirenheide.github.io/brainfuck/updatesite)  
+Add the update site link under `Help->Install New Software...` in the `Work with:` field.  
