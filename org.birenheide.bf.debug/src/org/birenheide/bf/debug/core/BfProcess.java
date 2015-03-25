@@ -63,7 +63,9 @@ public class BfProcess implements IProcess {
 	private final ProcessListener listener = new ProcessListener();
 	private final IStreamsProxy proxy;
 	private final BfOutputStream outStream;
+	private final BfOutputStream errorStream;
 	private final PrintStream interpreterPrintStream;
+	private final PrintStream interpreterErrorStream;
 	private final InputStream interpreterInputStream;
 	private final IFile possibleOutputFile;
 
@@ -101,6 +103,7 @@ public class BfProcess implements IProcess {
 		}
 		
 		this.outStream = proxy.getOutputStream();
+		this.errorStream = proxy.getErrorStream();
 		this.outStream.setAutoFlush(autoFlush);
 		if (outputFilename != null) {
 			IPath path = Path.fromOSString(outputFilename);
@@ -122,6 +125,12 @@ public class BfProcess implements IProcess {
 				throw new CoreException(new Status(IStatus.ERROR, DbgActivator.PLUGIN_ID, "Process could not be created", ex));
 			}
 		}
+		try {
+			this.interpreterErrorStream = new PrintStream(this.errorStream, true, encoding);
+		} 
+		catch (UnsupportedEncodingException ex) {
+			throw new CoreException(new Status(IStatus.ERROR, DbgActivator.PLUGIN_ID, "Process could not be created", ex));
+		}
 		
 		this.proxy = proxy;
 		
@@ -136,7 +145,7 @@ public class BfProcess implements IProcess {
 			throw new CoreException(new Status(IStatus.ERROR, DbgActivator.PLUGIN_ID, "File does not exist: " + file.toString()));
 		}
 		String code = getContentsAsString(file);
-		this.interpreter = new BrainfuckInterpreter(code.toCharArray(), this.interpreterPrintStream, this.interpreterInputStream);
+		this.interpreter = new BrainfuckInterpreter(code.toCharArray(), this.interpreterPrintStream, this.interpreterErrorStream, this.interpreterInputStream);
 		this.interpreter.addListener(listener);
 //		/*
 //		 * The launch framework has issues in the order of processing content obtained
@@ -170,6 +179,9 @@ public class BfProcess implements IProcess {
 				if (outStream != null) {
 					outStream.waitForListenerAdded();
 				}
+				if (errorStream != null) {
+					errorStream.waitForListenerAdded();
+				}
 				try {
 					if (interpreter instanceof Runnable) {
 						((Runnable) interpreter).run();
@@ -192,6 +204,7 @@ public class BfProcess implements IProcess {
 					}
 					interpreterPrintStream.flush();
 					interpreterPrintStream.close();
+					interpreterErrorStream.close();
 					if (possibleOutputFile != null) {
 						try {
 							possibleOutputFile.getParent().refreshLocal(IResource.DEPTH_ONE, null);
@@ -435,7 +448,7 @@ public class BfProcess implements IProcess {
 	private static class BfStreamsProxy implements IStreamsProxy {
 		
 		private final BfStreamMonitor output;
-		private final IStreamMonitor error;
+		private final BfStreamMonitor error;
 		private final PrintStream pipedPrintStream;
 		private final InputStream pipedInputStream;
 		
@@ -447,7 +460,7 @@ public class BfProcess implements IProcess {
 			else {
 				this.output = null;
 			}
-			this.error = null;
+			this.error = new BfStreamMonitor(encoding);
 			
 			if (createInputStream) {
 				PipedInputStream is = new PipedInputStream(1);
@@ -465,14 +478,17 @@ public class BfProcess implements IProcess {
 			return this.output!= null ? this.output.getStream() : null;
 		}
 		
+		BfOutputStream getErrorStream() {
+			return this.error.getStream();
+		}
+		
 		InputStream getInputStream() {
 			return this.pipedInputStream;
 		}
 
 		@Override
 		public IStreamMonitor getErrorStreamMonitor() {
-			//TODO connect interpreter exception handling here
-			return this.error; //Brainfuck does not support Error Stream
+			return this.error;
 		}
 
 		@Override

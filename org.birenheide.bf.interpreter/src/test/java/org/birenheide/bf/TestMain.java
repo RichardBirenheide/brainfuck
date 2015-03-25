@@ -12,11 +12,11 @@ public class TestMain {
 	private static final String TEST = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>++++++++++++++++++++++++++++++";
 
 	public static void main(String[] args) throws Exception {
-		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(NESTED_HELLO_WORLD.toCharArray(), System.out, System.in);
+		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(NESTED_HELLO_WORLD.toCharArray(), System.out, System.err, System.in);
 		interpreter.run();
 
 		System.out.println();
-		interpreter = new BrainfuckInterpreter(TEST.toCharArray(), System.out, System.in);
+		interpreter = new BrainfuckInterpreter(TEST.toCharArray(), System.out, System.err, System.in);
 		TestListener l = new TestListener();
 		interpreter.addListener(l);
 		interpreter.addBreakpoint(115);

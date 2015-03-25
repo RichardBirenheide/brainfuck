@@ -36,6 +36,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 	private final Map<Integer, List<MemoryWatchpoint>> watchpoints = new HashMap<>();
 	private char[] program;
 	private final PrintStream out;
+	private final PrintStream err;
 	private final InputStream in;
 	private volatile InterpreterState state = null;
 	private volatile boolean suspend = false;
@@ -49,9 +50,10 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 	private volatile int dataPointer = 0;
 	private volatile byte[] data = new byte[MIN_SIZE];
 	
-	public BrainfuckInterpreter(char[] program, PrintStream out, InputStream in) {
+	public BrainfuckInterpreter(char[] program, PrintStream out, PrintStream err, InputStream in) {
 		this.program = program;
 		this.out = out;
+		this.err = err;
 		this.in = in;
 	}
 	
@@ -96,7 +98,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 					case '<': {
 							dataPointer--;
 							if (dataPointer < 0) {
-								throw new InterpreterException("Illegal Data Pointer");
+								throw new InterpreterException("Illegal Data Pointer (<0) at ip=" + instructionPointer);
 							}
 							notifyDataPointerChanged();
 							break;
@@ -127,7 +129,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 							}
 						} 
 						catch (IOException ex) {
-							throw new InterpreterException("Reading a byte failed", ex);
+							throw new InterpreterException("Reading a byte failed at ip=" + instructionPointer + "; mp=" + dataPointer, ex);
 						}
 						break;
 					}
@@ -145,7 +147,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 										openingBrackets--;
 									}
 									instructionPointer++;
-									if (instructionPointer >= program.length) {
+									if (instructionPointer >= program.length && openingBrackets != 0) {
 										throw new InterpreterException("No matching closing bracket at: " + startBracketPosition);
 									}
 								}
@@ -169,7 +171,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 									}
 									instructionPointer--;
 									if (instructionPointer < 0) {
-										throw new InterpreterException("Non matching closing bracket at: " + startBracketPosition);
+										throw new InterpreterException("Non matching opening bracket at: " + startBracketPosition);
 									}
 								}
 								instructionPointer++; //Put pointer right of the bracket
@@ -182,7 +184,21 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 				notifyInstructionPointerChanged();
 			}
 		}
+		catch (InterpreterException ex) {
+			if (out != null) {
+				out.flush();
+			}
+			if (err != null) {
+				err.println();
+				err.println(ex.getMessage());
+				err.flush();
+			}
+			throw ex;
+		}
 		finally {
+			if (out != null) {
+				out.flush();
+			}
 			this.notifyFinished();
 			this.interpreterThread = null;
 			this.state = null;

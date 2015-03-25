@@ -76,7 +76,7 @@ public class Main {
 			return;
 		}
 		String source = new String(Files.readAllBytes(filePath), DEFAULT_CHARSET);
-		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(source.toCharArray(), output, input);
+		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(source.toCharArray(), output, null, input);
 		if (debugFilename != null) {
 			Properties props = new Properties();
 			props.load(new FileInputStream(debugFilename));
