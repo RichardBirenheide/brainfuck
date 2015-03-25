@@ -263,7 +263,7 @@ public class BfMainTab extends AbstractLaunchConfigurationTab {
 		try {
 			String fileName = configuration.getAttribute(FILE_ATTR, (String) null);
 			String projectName = configuration.getAttribute(PROJECT_ATTR, (String) null);
-			if (fileName == null || projectName == null) {
+			if (fileName == null || projectName == null || fileName.trim().isEmpty()) {
 				this.setErrorMessage("Project or File not specified");
 				return false;
 			}
