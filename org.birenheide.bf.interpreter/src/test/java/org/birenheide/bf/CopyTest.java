@@ -19,10 +19,10 @@ public class CopyTest extends InterpreterTestCase {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		PrintStream out = new PrintStream(bos);
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream(INPUT);
-		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(source.toCharArray(), out, System.err, is);
+		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(source.toCharArray(), out, null, is);
 		interpreter.run();
 		String expected = this.readResource(INPUT);
-		String actual = new String(bos.toByteArray(), 0, bos.toByteArray().length - 1, "UTF-8");
+		String actual = new String(bos.toByteArray(), "UTF-8");
 		assertEquals(expected, actual);
 	}
 
