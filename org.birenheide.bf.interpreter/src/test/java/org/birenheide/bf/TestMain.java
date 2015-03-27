@@ -92,8 +92,8 @@ public class TestMain {
 		}
 
 		@Override
-		public void interpreterFinished(InterpreterState state) {
-			System.err.println("Finished");
+		public void interpreterFinished(InterpreterState state, List<EventReason> reasons) {
+			System.err.println("Finished: " + reasons);
 			this.finished = true;
 		}
 		

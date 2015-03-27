@@ -297,8 +297,6 @@ public class BfProcess implements IProcess {
 	@Override
 	public void terminate() throws DebugException {
 		this.interpreter.terminate();
-		
-		
 	}
 
 	@Override
@@ -337,7 +335,6 @@ public class BfProcess implements IProcess {
 		private volatile boolean isSuspended = false;
 		private List<DebugElement> debugElements = Collections.synchronizedList(new ArrayList<DebugElement>(2));
 		private volatile InterpreterState suspendedState = null;
-		private List<EventReason> lastSuspendedReasons = Collections.emptyList();
 		
 		void addEventSourceElement(DebugElement element) {
 			if (!this.debugElements.contains(element)) {
@@ -386,7 +383,6 @@ public class BfProcess implements IProcess {
 		@Override
 		public void interpreterSuspended(InterpreterState state, List<EventReason> eventReasons) {
 			this.suspendedState = state;
-			this.lastSuspendedReasons = eventReasons;
 			this.isSuspended = true;
 			synchronized (this.debugElements) {
 				for (DebugElement element : this.debugElements) {
@@ -402,10 +398,6 @@ public class BfProcess implements IProcess {
 				}
 			}
 		}
-		
-		List<EventReason> lastSuspendedEventReasons() {
-			return this.lastSuspendedReasons;
-		}
 
 		boolean isSuspended() {
 			return this.isSuspended;
@@ -417,7 +409,7 @@ public class BfProcess implements IProcess {
 		}
 
 		@Override
-		public void interpreterFinished(InterpreterState state) {
+		public void interpreterFinished(InterpreterState state, List<EventReason> reasons) {
 			this.isStopped = true;
 			this.isSuspended = false;
 			IDebugTarget target = null;
@@ -445,6 +437,10 @@ public class BfProcess implements IProcess {
 		}
 	}
 	
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
 	private static class BfStreamsProxy implements IStreamsProxy {
 		
 		private final BfStreamMonitor output;
@@ -505,6 +501,10 @@ public class BfProcess implements IProcess {
 		}
 	}
 	
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
 	private static class BfStreamMonitor implements IStreamMonitor {
 		
 		private final BfOutputStream stream;
@@ -538,6 +538,10 @@ public class BfProcess implements IProcess {
 		
 	}
 	
+	/**
+	 * @author Richard Birenheide
+	 *
+	 */
 	private static class BfOutputStream extends ByteArrayOutputStream {
 
 		private static long MAX_WAIT_TIME = 5000;

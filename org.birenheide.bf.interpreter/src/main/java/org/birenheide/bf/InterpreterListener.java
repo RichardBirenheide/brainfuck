@@ -51,8 +51,9 @@ public interface InterpreterListener {
 	 * Called when the interpreter finishes either when the program is finished or
 	 * by a call to {@link Debuggable#terminate()}.
 	 * @param state the current state. Only valid during the lifetime of this call.
+	 * @param eventReasons list of reasons leading to termination.
 	 */
-	public void interpreterFinished(InterpreterState state);
+	public void interpreterFinished(InterpreterState state, List<EventReason> eventReasons);
 	/**
 	 * Called when interpreter starts. Is called before any instruction is executed.
 	 * @param state the current state. Only valid during the lifetime of this call.

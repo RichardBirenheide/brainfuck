@@ -22,5 +22,14 @@ public enum EventReason {
 	 * The state of the interpreter has been changed by a call
 	 * from outside.
 	 */
-	ClientRequest
+	ClientRequest,
+	/**
+	 * The interpreter finished its execution normally.
+	 */
+	Finished,
+	/**
+	 * The interpreter finished its execution because of an exception.
+	 */
+	Failed
+	
 }

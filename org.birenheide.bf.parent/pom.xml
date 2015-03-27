@@ -241,7 +241,7 @@
 		</profile>
 
 		<profile>
-			<id>update-sites-assembly</id>
+			<id>update-site-assembly</id>
 			<modules>
 				<module>../org.birenheide.bf.feature</module>
 				<module>../org.birenheide.bf.updatesite</module>

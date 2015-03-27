@@ -2,6 +2,7 @@ package org.birenheide.bf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 	}
 	
 	public void run() {
+		EventReason terminateReason = EventReason.Finished;
 		try {
 			this.interpreterThread = Thread.currentThread();
 			this.notifyStarted();
@@ -77,11 +79,13 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 							}
 						} 
 						catch (InterruptedException e) {
+							terminateReason = EventReason.ClientRequest;
 							return; //Thread has been interrupted
 						}
 						this.notifyResumed();
 					}
 					if (Thread.interrupted()) {
+						terminateReason = EventReason.ClientRequest;
 						return;
 					}
 				} //End debugger section
@@ -127,7 +131,10 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 //								System.out.println(b + ":" + (data[dataPointer] & 0xff));
 								notifyDataChanged();
 							}
-						} 
+						}
+						catch (InterruptedIOException ex) {
+							terminateReason = EventReason.ClientRequest; //Likely an interruption from outside
+						}
 						catch (IOException ex) {
 							throw new InterpreterException("Reading a byte failed at ip=" + instructionPointer + "; mp=" + dataPointer, ex);
 						}
@@ -136,10 +143,9 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 					case '[': {
 						synchronized (this.programExchangeLock) {
 							if (data[dataPointer] == 0) {
-								int openingBrackets = 1;
+								int openingBrackets = 0;
 								int startBracketPosition = instructionPointer;
-								instructionPointer++;
-								while (openingBrackets != 0) {
+								do {
 									if (program[instructionPointer] == '[') {
 										openingBrackets++;
 									}
@@ -150,7 +156,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 									if (instructionPointer >= program.length && openingBrackets != 0) {
 										throw new InterpreterException("No matching closing bracket at: " + startBracketPosition);
 									}
-								}
+								} while (openingBrackets != 0);
 								instructionPointer--; //Instruction pointer is one too far after last bracket close.
 							}
 							break;
@@ -185,6 +191,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 			}
 		}
 		catch (InterpreterException ex) {
+			terminateReason = EventReason.Failed;
 			if (out != null) {
 				out.flush();
 			}
@@ -199,7 +206,7 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 			if (out != null) {
 				out.flush();
 			}
-			this.notifyFinished();
+			this.notifyFinished(terminateReason);
 			this.interpreterThread = null;
 			this.state = null;
 		}
@@ -390,9 +397,9 @@ public class BrainfuckInterpreter implements Runnable, Debuggable {
 		}
 	}
 	
-	private void notifyFinished() {
+	private void notifyFinished(EventReason reason) {
 		for (InterpreterListener listener : this.listeners) {
-			listener.interpreterFinished(this.state);
+			listener.interpreterFinished(this.state, Arrays.asList(reason));
 		}
 	}
 	
