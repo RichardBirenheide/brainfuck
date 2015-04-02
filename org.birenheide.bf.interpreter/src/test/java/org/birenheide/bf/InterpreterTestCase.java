@@ -21,7 +21,23 @@ public class InterpreterTestCase {
 		finally {
 			sc.close();
 		}
-		
-		
+	}
+
+	protected TestListener runInterpreter(final BrainfuckInterpreter interpreter) {
+		TestListener listener = new TestListener();
+		interpreter.addListener(listener);
+		Thread t = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					interpreter.run();
+				}
+				catch (InterpreterException ex) {}
+			}
+		}, "Interpreter");
+		t.setDaemon(true);
+		t.start();
+		return listener;
 	}
 }
