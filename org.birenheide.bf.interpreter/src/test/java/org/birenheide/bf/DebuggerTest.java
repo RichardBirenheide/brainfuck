@@ -47,6 +47,48 @@ public class DebuggerTest extends InterpreterTestCase {
 	}
 	
 	@Test(timeout=10000)
+	public void testStep() throws Exception {
+		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(LONG_LOOP.toCharArray(), null, null, null);
+		
+		interpreter.addBreakpoint(0);
+		
+		TestListener listener = this.runInterpreter(interpreter);
+		
+		try {
+			while (!listener.isStarted()) {
+				Thread.sleep(1);
+			}
+			while (!listener.isSuspended()) {
+				Thread.sleep(1);
+			}
+			InterpreterState state = listener.getSuspendState();
+			assertEquals(0, state.instructionPointer());
+			for (int i = 0; i < 5; i++) {
+				assertTrue(listener.isSuspended());
+				interpreter.step();
+				
+				while (listener.isSuspended()) {
+//					Thread.sleep(1);
+				}
+				while (!listener.isSuspended()) {
+					Thread.sleep(1);
+				}
+				assertTrue(listener.isSuspended());
+				assertEquals(i + 1, state.instructionPointer());
+			}
+			state = listener.getSuspendState();
+			assertEquals(5, state.instructionPointer());
+			assertEquals(2, state.dataPointer());
+			assertEquals(255, state.dataSnapShot(2, 3)[0] & 0xFF);
+			assertEquals(1, listener.getSuspendReasons().size());
+			assertEquals(EventReason.StepEnd, listener.getSuspendReasons().get(0));
+		}
+		finally {
+			interpreter.terminate();
+		}
+	}
+	
+	@Test(timeout=10000)
 	public void testValueWatchpoint() throws Exception {
 		BrainfuckInterpreter interpreter = new BrainfuckInterpreter(LONG_LOOP.toCharArray(), null, null, null);
 		
