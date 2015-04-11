@@ -1,13 +1,14 @@
 package org.birenheide.bf;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 
-public class InterpreterTests extends InterpreterTestCase {
+public class InterpreterTest extends InterpreterTestCase {
 
 	private static final String SHORT_LOOP = "-[-?]";
 	private static final String LONG_MEMORY = ">>>>>>>>>>>>";
@@ -42,8 +43,10 @@ public class InterpreterTests extends InterpreterTestCase {
 			int initialSize = state.getDataSize();
 			
 			interpreter.resume();
-			while (listener.isSuspended());
-			while (!listener.isSuspended());
+			Thread.sleep(10);
+			while (!listener.isSuspended()) {
+				Thread.sleep(1);
+			}
 			assertEquals(11, state.instructionPointer());
 			state = listener.getSuspendState();
 			assertEquals(2 * initialSize, state.getDataSize());
@@ -52,5 +55,14 @@ public class InterpreterTests extends InterpreterTestCase {
 		finally {
 			interpreter.terminate();
 		}
+	}
+	
+	@Test
+	public void reservedCharTest() throws Exception {
+		char[] reservedChars = {'<', '>', '+', '-', '.', ',', '[', ']'};
+		for (char c : reservedChars) {
+			assertTrue(BrainfuckInterpreter.isReservedChar(c));
+		}
+		assertFalse(BrainfuckInterpreter.isReservedChar('?'));
 	}
 }

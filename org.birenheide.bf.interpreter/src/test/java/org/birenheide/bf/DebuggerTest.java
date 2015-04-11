@@ -66,10 +66,7 @@ public class DebuggerTest extends InterpreterTestCase {
 			for (int i = 0; i < 5; i++) {
 				assertTrue(listener.isSuspended());
 				interpreter.step();
-				
-				while (listener.isSuspended()) {
-//					Thread.sleep(1);
-				}
+				Thread.sleep(10); //Wait for continuation.
 				while (!listener.isSuspended()) {
 					Thread.sleep(1);
 				}
