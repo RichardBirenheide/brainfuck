@@ -6,9 +6,9 @@
 
     <parent>
         <groupId>org.birenheide.bf</groupId>
-        <artifactId>parent</artifactId>
+        <artifactId>ecl-parent</artifactId>
         <version>0.0.2-SNAPSHOT</version>
-        <relativePath>../org.birenheide.bf.parent</relativePath>
+        <relativePath>../org.birenheide.bf.ecl.parent</relativePath>
     </parent>
 
     <artifactId>target</artifactId>
@@ -33,6 +33,11 @@
                                     <file>luna.target</file>
                                     <type>target</type>
                                     <classifier>luna</classifier>
+                                </artifact>
+                                 <artifact>
+                                    <file>latest.target</file>
+                                    <type>target</type>
+                                    <classifier>latest</classifier>
                                 </artifact>
                              </artifacts>
                         </configuration>

@@ -6,9 +6,9 @@
 
 	<parent>
 		<groupId>org.birenheide.bf</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>ecl-parent</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
-		<relativePath>../org.birenheide.bf.parent</relativePath>
+		<relativePath>../org.birenheide.bf.ecl.parent</relativePath>
 	</parent>
 
 	<artifactId>org.birenheide.bf</artifactId>
@@ -24,6 +24,7 @@
 			<groupId>org.birenheide.bf</groupId>
 			<artifactId>interpreter</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -52,7 +53,7 @@
 						<goals>
 							<goal>copy</goal>
 						</goals>
-						<!-- <phase>packaging</phase> -->
+						<phase>prepare-package</phase>
 						<configuration>
 							<artifactItems>
 								<artifactItem>
@@ -67,11 +68,11 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>unpack</id>
+						<id>copy-sources</id>
 						<goals>
 							<goal>unpack</goal>
 						</goals>
-						<!-- <phase>packaging</phase> -->
+						<phase>prepare-package</phase>
 						<configuration>
 							<artifactItems>
 								<artifactItem>
@@ -91,6 +92,19 @@
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<configuration>
+					<extraClasspathElements>
+						<extraClasspathElement>
+							<groupId>org.birenheide.bf</groupId>
+							<artifactId>interpreter</artifactId>
+							<version>${project.version}</version>
+						</extraClasspathElement>
+					</extraClasspathElements>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
 				<executions>
 					<execution>
@@ -98,6 +112,7 @@
 						<goals>
 							<goal>plugin-source</goal>
 						</goals>
+<!-- 						<phase>package</phase> -->
 						<configuration>
 							<additionalFileSets>
 								<fileSet>

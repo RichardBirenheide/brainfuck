@@ -34,5 +34,13 @@ Templates can operate on number tuples separated by semicolon to enable easy tem
 * **Debugging**  
 Supports breakpoints, watchpoints and stepping. 
 
-* [Eclipse Update Site](http://richardbirenheide.github.io/brainfuck/updatesite)  
+* [Eclipse Update Site](https://richardbirenheide.github.io/brainfuck/updatesite)  
 Add the update site link under `Help->Install New Software...` in the `Work with:` field.  
+
+## Building the code
+The project can be built with Maven. The reactor `pom.xml` is in project `org.birenheide.bf.parent`.
+
+The reactor pom builds only the interpreter and the Eclipse plugins. The target platform for the build is Eclipse Luna.
+There are two more profiles defined:
+* `latest-target` which builds against the latest version of Eclipse
+* `update-site-assembly` which will also build the Eclipse Feature and the Update Site

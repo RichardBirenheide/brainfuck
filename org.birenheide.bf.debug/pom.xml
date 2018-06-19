@@ -6,13 +6,38 @@
 
 	<parent>
 		<groupId>org.birenheide.bf</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>ecl-parent</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
-		<relativePath>../org.birenheide.bf.parent</relativePath>
+		<relativePath>../org.birenheide.bf.ecl.parent</relativePath>
 	</parent>
 
 	<artifactId>org.birenheide.bf.debug</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<name>Brainfuck Debug Plugin</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.birenheide.bf</groupId>
+			<artifactId>org.birenheide.bf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<configuration>
+					<extraClasspathElements>
+						<extraClasspathElement>
+							<groupId>org.birenheide.bf</groupId>
+							<artifactId>interpreter</artifactId>
+							<version>${project.version}</version>
+						</extraClasspathElement>
+					</extraClasspathElements>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
