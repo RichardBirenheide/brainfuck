@@ -160,43 +160,21 @@
 		<profile>
 			<id>integration-tests</id>
 			<modules>
+				<module>../org.birenheide.bf.test</module>
 			</modules>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>target-platform-configuration</artifactId>
-						<configuration>
-							<dependency-resolution>
-								<extraRequirements>
-									<requirement>
-										<type>p2-installable-unit</type>
-										<id>org.eclipse.platform.ide</id>
-										<versionRange>0.0.0</versionRange>
-									</requirement>
-								</extraRequirements>
-							</dependency-resolution>
-							<target>
-								<artifact>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>target</artifactId>
-									<version>${project.version}</version>
-								</artifact>
-							</target>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>tycho-surefire-plugin</artifactId>
 						<configuration>
-							<useUIHarness>true</useUIHarness>
+							<useUIHarness>false</useUIHarness>
 							<product>org.eclipse.platform.ide</product>
 							<argLine>-Xmx512m</argLine>
 							<argLine>-XX:MaxPermSize=256m</argLine>
 							<appArgLine>-eclipse.password ../test.common/pwd.txt</appArgLine>
-							<showEclipseLog>true</showEclipseLog>
+<!-- 							<showEclipseLog>false</showEclipseLog> -->
 							<forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
-							<!-- <testRuntime>p2Installed</testRuntime> -->
 						</configuration>
 					</plugin>
 				</plugins>

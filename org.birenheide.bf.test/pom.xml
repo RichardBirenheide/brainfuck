@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.birenheide.bf</groupId>
+		<artifactId>ecl-parent</artifactId>
+		<version>0.0.2-SNAPSHOT</version>
+		<relativePath>../org.birenheide.bf.ecl.parent</relativePath>
+	</parent>
+
+	<artifactId>org.birenheide.bf.test</artifactId>
+	<packaging>eclipse-test-plugin</packaging>
+	<name>Brainfuck Editor Test Fragment</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.birenheide.bf</groupId>
+			<artifactId>org.birenheide.bf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<configuration>
+					<extraClasspathElements>
+						<extraClasspathElement>
+							<groupId>org.birenheide.bf</groupId>
+							<artifactId>interpreter</artifactId>
+							<version>${project.version}</version>
+						</extraClasspathElement>
+					</extraClasspathElements>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

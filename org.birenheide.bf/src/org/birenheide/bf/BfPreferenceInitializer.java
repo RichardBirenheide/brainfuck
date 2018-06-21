@@ -1,5 +1,8 @@
 package org.birenheide.bf;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ed.EditorConstants;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -13,6 +16,16 @@ import org.eclipse.ui.editors.text.EditorsUI;
 public class BfPreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public static final String TEMPLATE_KEY = "org.birenheide.bf.brainfuck";
+	
+	public static final Map<Integer, RGB> FALLBACK_COLORS = new TreeMap<Integer, RGB>();
+	static {
+		FALLBACK_COLORS.put(SWT.COLOR_DARK_GRAY, new RGB(128, 128, 128));
+		FALLBACK_COLORS.put(SWT.COLOR_DARK_MAGENTA, new RGB(128, 0, 128));
+		FALLBACK_COLORS.put(SWT.COLOR_DARK_GREEN, new RGB(0, 128, 0));
+		FALLBACK_COLORS.put(SWT.COLOR_BLUE, new RGB(0, 0, 255));
+	}
+	public static final RGB UNKNOWN_COLOR = new RGB(255, 0, 0);
+	
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = BfActivator.getDefault().getPreferenceStore();
@@ -33,8 +46,14 @@ public class BfPreferenceInitializer extends AbstractPreferenceInitializer {
 	}
 	
 	private RGB getSystemColorRGB(int id) {
-		return Display.getDefault().getSystemColor(id).getRGB();
+		if (Display.getCurrent() != null) {
+			return Display.getCurrent().getSystemColor(id).getRGB();
+		}
+		else if (FALLBACK_COLORS.containsKey(id)) {
+			return FALLBACK_COLORS.get(id);
+		}
+		else {
+			return UNKNOWN_COLOR;
+		}
 	}
-	
-	
 }
