@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.birenheide.bf</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 		<relativePath>../org.birenheide.bf.parent</relativePath>
 	</parent>
 
@@ -62,7 +62,7 @@
 							<arch>x86_64</arch>
 						</environment>
 					</environments>
-					<executionEnvironment>JavaSE-1.7</executionEnvironment>
+					<executionEnvironment>JavaSE-1.8</executionEnvironment>
 					<pomDependencies>consider</pomDependencies>
 				</configuration>
 			</plugin>
@@ -99,6 +99,8 @@
 					<artifactId>tycho-compiler-plugin</artifactId>
 					<version>${tycho-version}</version>
 					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
 						<useProjectSettings>false</useProjectSettings>
 					</configuration>
 				</plugin>
