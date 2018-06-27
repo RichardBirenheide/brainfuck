@@ -8,3 +8,4 @@ Require-Bundle: org.eclipse.help.ui;bundle-version="4.0.0",
  org.birenheide.bf;bundle-version="1.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: org.birenheide.bf.help
