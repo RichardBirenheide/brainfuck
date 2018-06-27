@@ -17,3 +17,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.birenheide.bf.core.BfActivator
 Export-Package: org.birenheide.bf;x-friends:="org.birenheide.bf.help,org.birenheide.bf.debug",
  org.birenheide.bf.ed;x-friends:="org.birenheide.bf.debug"
+Automatic-Module-Name: org.birenheide.bf
