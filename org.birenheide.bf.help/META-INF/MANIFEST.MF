@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Brainfuck Help
 Bundle-SymbolicName: org.birenheide.bf.help;singleton:=true
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2.qualifier
 Bundle-Activator: org.birenheide.bf.help.HelpActivator
 Require-Bundle: org.eclipse.help.ui;bundle-version="4.0.0",
- org.birenheide.bf;bundle-version="1.0.1"
+ org.birenheide.bf;bundle-version="1.0.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: org.birenheide.bf.help
