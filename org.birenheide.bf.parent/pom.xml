@@ -6,7 +6,7 @@
 
 	<groupId>org.birenheide.bf</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Parent for Brainfuck Tools</name>
