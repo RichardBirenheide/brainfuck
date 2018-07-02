@@ -416,5 +416,31 @@
             class="org.birenheide.bf.debug.ui.InstructionPointerAnnotationHover">
       </annotationHoverClass>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.debug.ui.DebugPerspective">
+         <view
+               id="org.eclipse.debug.ui.MemoryView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="false">
+         </view>
+         <view
+               id="org.eclipse.debug.ui.RegisterView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="false">
+         </view>
+         <viewShortcut
+               id="org.eclipse.debug.ui.MemoryView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.debug.ui.RegisterView">
+         </viewShortcut>
+      </perspectiveExtension>
+   </extension>
 
 </plugin>

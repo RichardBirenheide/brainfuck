@@ -54,6 +54,8 @@ public class BfMemoryRendering extends AbstractTableRendering {
 			}
 		};
 	}
+	
+	
 
 	@Override
 	public void refresh() {
@@ -66,7 +68,7 @@ public class BfMemoryRendering extends AbstractTableRendering {
 		super.becomesVisible();
 		this.revealMemoryPointer();
 	}
-
+	
 	@Override
 	public String getString(String renderingTypeId, BigInteger address,
 			MemoryByte[] data) {
@@ -75,17 +77,15 @@ public class BfMemoryRendering extends AbstractTableRendering {
 		int i = -1;
 		for (MemoryByte mb : data) {
 			i++;
-			if (address.intValue() + i >= maxAddress) {
-				result.append("??");
+			if (address.intValueExact() + i >= maxAddress) {
+				result.append("?? ");
 				continue;
 			}
 			int b = mb.getValue() & 0xFF;
-			String val = Integer.toHexString(b).toUpperCase();
-			String pre = "";
-			if (val.length() == 1) {
-				pre = "0";
-			}
-			result.append(pre).append(val);
+			result.append(formatToRawHex(b)).append(" ");
+		}
+		if (result.length() > 0) {
+			result.setLength(result.length() - 1);
 		}
 		return result.toString();
 	}
@@ -97,6 +97,22 @@ public class BfMemoryRendering extends AbstractTableRendering {
 		return null;
 	}
 
+
+	@Override
+	protected String getToolTipText(BigInteger address, MemoryByte[] bytes) {
+		int memoryPointer = ((BfMemoryBlock)getMemoryBlock()).getMemoryPointer();
+		if (bytes.length == 0) {
+			return super.getToolTipText(address, bytes);
+		}
+		int startAddress = address.intValueExact();
+		int endAddress = startAddress + bytes.length - 1;
+		String suffix = "";
+		if (memoryPointer >= startAddress && memoryPointer <= endAddress) {
+			suffix = "; mp=0x" + Integer.toHexString(memoryPointer).toUpperCase() + " (" + (memoryPointer - startAddress + 1) + ")";
+		}
+		
+		return "Adress: 0x" + Integer.toHexString(startAddress).toUpperCase() + " - 0x" + Integer.toHexString(endAddress).toUpperCase() + suffix;
+	}
 
 	private void revealMemoryPointer() {
 		int memoryPointer = ((BfMemoryBlock)getMemoryBlock()).getMemoryPointer();
@@ -120,5 +136,14 @@ public class BfMemoryRendering extends AbstractTableRendering {
 			DbgActivator.getDefault().logError("Cursor cannot be set to invisible", e);
 		}
 	}
-
+	
+	private String formatToRawHex(int value) {
+		String val = Integer.toHexString(value).toUpperCase();
+		if (val.length() == 1) {
+			return "0" + val;
+		}
+		else {
+			return val;
+		}
+	}
 }
