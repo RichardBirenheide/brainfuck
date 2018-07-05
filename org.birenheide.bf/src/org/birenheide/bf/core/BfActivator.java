@@ -4,12 +4,16 @@ import java.io.IOException;
 
 import org.birenheide.bf.AbstractBfActivator;
 import org.birenheide.bf.BfPreferenceInitializer;
+import org.birenheide.bf.ed.EditorCloseListener;
 import org.birenheide.bf.ed.template.BfTemplateType;
 import org.birenheide.bf.ed.template.ParametrizedTemplateTypeDescriptor;
 import org.birenheide.bf.ui.BfImages;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.osgi.framework.BundleContext;
@@ -23,6 +27,7 @@ public class BfActivator extends AbstractBfActivator {
 
 	private TemplateStore templateStore = null;
 	private ContextTypeRegistry registry = null;
+	private final IPartListener2 editorCloseListener = new EditorCloseListener();
 
 	public final static String BF_PROBLEM_MARKER_ID = BUNDLE_SYMBOLIC_NAME + ".brainfuckProblemMarker";
 	
@@ -47,6 +52,9 @@ public class BfActivator extends AbstractBfActivator {
 		catch (IOException e) {
 			logError("Templates coud not be loaded", e);
 		}
+		Display.getDefault().asyncExec(() -> {
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().addPartListener(editorCloseListener);
+		});
 	}
 
 	@Override
@@ -55,6 +63,9 @@ public class BfActivator extends AbstractBfActivator {
 		
 		this.templateStore = null;
 		this.registry = null;
+		Display.getDefault().asyncExec(() -> {
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().removePartListener(editorCloseListener);
+		});
 		super.stop(context);
 	}
 	
