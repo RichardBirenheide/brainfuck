@@ -1,6 +1,7 @@
 package org.birenheide.bf.ed;
 
 import static org.birenheide.bf.core.BfActivator.BF_PROBLEM_MARKER_ID;
+import static org.birenheide.bf.core.BfActivator.BUNDLE_SYMBOLIC_NAME;
 
 import java.io.InputStream;
 import java.util.ArrayDeque;
@@ -18,10 +19,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.ui.actions.ToggleBreakpointAction;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -29,6 +32,7 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.source.DefaultCharacterPairMatcher;
+import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -39,6 +43,10 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
 public class BfEditor extends TextEditor {
+	
+	private static final String ACTION_CONTRIBUTOR_ID = "editorActionContributor";
+
+	private static final String CLASS_ATTRIBUTE = "class";
 
 	private BfContentValidator validator = new BfContentValidator();
 	
@@ -87,14 +95,29 @@ public class BfEditor extends TextEditor {
 	@Override
 	protected void createActions() {
 		super.createActions();
-		//TODO find a way to decouple this from this plugin (should be in the debug plugin). 
-		this.setAction(
-				ITextEditorActionConstants.RULER_DOUBLE_CLICK, 
-				new ToggleBreakpointAction(this, null, this.getVerticalRuler()));
+		
+		IExtensionRegistry registry = RegistryFactory.getRegistry();
+		for (IConfigurationElement extension : registry.getConfigurationElementsFor(BUNDLE_SYMBOLIC_NAME, ACTION_CONTRIBUTOR_ID)) {
+			if (extension.isValid()) {
+				try {
+					ActionContributor actionContributor = (ActionContributor) extension.createExecutableExtension(CLASS_ATTRIBUTE);
+					if (actionContributor != null) {
+						actionContributor.addActions(this);
+					}
+				} 
+				catch (CoreException | ClassCastException ex) {
+					BfActivator.getDefault().logError("AnnotationHover coud not be created", ex);
+				}
+			}
+		}
+		
 		this.setAction(ITextEditorActionConstants.RULER_PREFERENCES, new OpenBfEditorPreferenceDialog());
 		this.setAction(ITextEditorActionConstants.CONTEXT_PREFERENCES, new OpenBfEditorPreferenceDialog());
 	}
 
+	public IVerticalRuler revealVerticalRuler() {
+		return this.getVerticalRuler();
+	}
 
 	
 	@Override

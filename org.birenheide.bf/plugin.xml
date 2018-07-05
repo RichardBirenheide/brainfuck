@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="annotationHover" name="Annotation Hover Contribution to Brainfuck Editor" schema="schema/annotationHover.exsd"/>
+   <extension-point id="editorActionContributor" name="Action Contribution to Brainfuck Editor" schema="schema/editorActionContributor.exsd"/>
    <extension
          point="org.eclipse.ui.editors">
       <editor

@@ -442,5 +442,11 @@
          </viewShortcut>
       </perspectiveExtension>
    </extension>
+   <extension
+         point="org.birenheide.bf.editorActionContributor">
+      <editorActionContributorClass
+            class="org.birenheide.bf.debug.ui.BfEditorActionContributor">
+      </editorActionContributorClass>
+   </extension>
 
 </plugin>
