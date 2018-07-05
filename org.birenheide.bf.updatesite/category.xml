@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.birenheide.bf.feature_1.0.3.jar" id="org.birenheide.bf.feature" version="1.0.3">
+   <feature url="features/org.birenheide.bf.feature_1.0.4.qualifier.jar" id="org.birenheide.bf.feature" version="1.0.4.qualifier">
       <category name="org.birenheide.bf"/>
    </feature>
-   <feature url="features/org.birenheide.bf.feature_1.0.3-sources-feature.jar" id="org.birenheide.bf.feature.source" version="1.0.3">
+   <feature url="features/org.birenheide.bf.feature_1.0.4.qualifier-sources-feature.jar" id="org.birenheide.bf.feature.source" version="1.0.4.qualifier">
       <category name="org.birenheide.bf"/>
    </feature>
    <category-def name="org.birenheide.bf" label="Brainfuck Tools">
