@@ -2,10 +2,12 @@ package org.birenheide.bf.ed;
 
 import static org.birenheide.bf.core.BfActivator.BF_PROBLEM_MARKER_ID;
 
+import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Scanner;
 
 import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ed.template.BfTemplatePreferencePage;
@@ -15,12 +17,14 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.actions.ToggleBreakpointAction;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -106,8 +110,35 @@ public class BfEditor extends TextEditor {
 		}
 		super.handlePreferenceStoreChanged(event);
 	}
-
-
+	
+	public void validateFromResource() {
+		Scanner sc = null;
+		try  {
+			if (this.getEditorInput() instanceof IFileEditorInput) {
+				IFile file = ((IFileEditorInput) this.getEditorInput()).getFile();
+				if (!file.exists()) {
+					return;
+				}
+				InputStream is = file.getContents();
+				sc = new Scanner(is, file.getCharset(true));
+				sc.useDelimiter("\\A");
+				String text = sc.next();
+				IDocument document = new Document(text);
+				this.validator.validate(document);
+			}
+			else {
+				return;
+			}
+		} 
+		catch (BadLocationException | CoreException | IllegalArgumentException ex) {
+			BfActivator.getDefault().logError("Document could not be validated", ex);
+		}
+		finally {
+			if (sc != null) {
+				sc.close();
+			}
+		}
+	}
 
 	/**
 	 * @author Richard Birenheide
@@ -143,7 +174,6 @@ public class BfEditor extends TextEditor {
 		public void documentChanged(DocumentEvent event) {
 			if (event.fText.length() > 0) {//Text inserted
 				String insertedText = event.fText;
-//				System.out.println("insert: >" + insertedText + "<");
 				this.validate = this.validate || insertedText.contains("[") || insertedText.contains("]");
 			}
 			if (this.validate) {
@@ -192,8 +222,21 @@ public class BfEditor extends TextEditor {
 					}
 				}
 			}
-			final IFile resource = ((IFileEditorInput) getEditorInput()).getFile();
-			
+
+			IFile res = null;
+			if (getEditorInput() instanceof IFileEditorInput) {
+				res = ((IFileEditorInput) getEditorInput()).getFile();
+			}
+			else if (getEditorInput() instanceof IAdaptable) {
+				res = (IFile) getEditorInput().getAdapter(IFile.class);
+				if (res == null) {
+					return;
+				}
+			}
+			else {
+				return;
+			}
+			final IFile resource = res;
 			WorkspaceJob wsj = new WorkspaceJob("Validate") {
 				@Override
 				public IStatus runInWorkspace(IProgressMonitor monitor)
@@ -206,6 +249,7 @@ public class BfEditor extends TextEditor {
 						marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 						marker.setAttribute(IMarker.LOCATION, "Index: " + loc);
 						marker.setAttribute(IMarker.MESSAGE, "Non-matching opening bracket");
+						marker.setAttribute(IMarker.TRANSIENT, true);
 					}
 					for (int loc : invalidClosedBrackets) {
 						IMarker marker = resource.createMarker(BF_PROBLEM_MARKER_ID);
@@ -214,6 +258,7 @@ public class BfEditor extends TextEditor {
 						marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 						marker.setAttribute(IMarker.LOCATION, "Index: " + loc);
 						marker.setAttribute(IMarker.MESSAGE, "Non-matching closing bracket");
+						marker.setAttribute(IMarker.TRANSIENT, true);
 					}
 					return Status.OK_STATUS;
 				}
@@ -221,7 +266,6 @@ public class BfEditor extends TextEditor {
 			wsj.setRule(resource);
 			wsj.schedule();
 		}
-		
 	}
 	
 	
