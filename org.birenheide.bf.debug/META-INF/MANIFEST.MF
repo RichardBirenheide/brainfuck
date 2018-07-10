@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Brainfuck Debug
 Bundle-SymbolicName: org.birenheide.bf.debug;singleton:=true
-Bundle-Version: 1.0.4
+Bundle-Version: 1.0.5.qualifier
 Bundle-Activator: org.birenheide.bf.debug.DbgActivator
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.10.0",
  org.eclipse.ui;bundle-version="3.106.0",
- org.birenheide.bf;bundle-version="1.0.4",
+ org.birenheide.bf;bundle-version="1.0.5",
  org.eclipse.debug.ui;bundle-version="3.10.0",
  org.eclipse.jface.text;bundle-version="3.9.0",
  org.eclipse.ui.editors;bundle-version="3.8.0",
