@@ -2,8 +2,8 @@ package org.birenheide.bf.ed;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.birenheide.bf.core.BfActivator;
 import org.birenheide.bf.ed.template.BfTemplateContext;
@@ -34,12 +34,15 @@ class BfTemplateCompletionProcessor extends TemplateCompletionProcessor {
 	
 	static List<String> parseParameters(String prefix) {
 		List<String> parameters = new ArrayList<>(Arrays.asList(prefix.split(";")));
-		for (Iterator<String> i = parameters.iterator(); i.hasNext();) {
-			String param = i.next();
-			if ("".equals(param.trim())) {
-				i.remove();
-			}
-		}
+		
+		/*
+		 * Filter out empty parameters and convert values prefixed with '!' to negative values.
+		 * Assumes that all parameters are numbers.
+		 */
+		parameters = parameters.stream()
+			.filter(param -> !"".equals(param.trim()))
+			.map(param -> param.trim().startsWith("!") ? "-" + param.trim().substring(1) : param)
+			.collect(Collectors.toList());
 		return parameters;
 	}
 	
