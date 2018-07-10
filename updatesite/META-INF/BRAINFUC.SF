@@ -1,45 +1,45 @@
 Signature-Version: 1.0
 SHA-256-Digest-Manifest-Main-Attributes: MTCUzCxwLDTMN3XqTOM6/g06Az3M0
  a09XQ+TKLsjFNo=
-SHA-256-Digest-Manifest: JFNJKJ+wdkfc2/sRtzJhMKqRE6rQmKqMpz/Y2HtT/hE=
+SHA-256-Digest-Manifest: V+qeph0DOhyKIEOAX8EkNTM0MnYt7GkvUa/EVhZ+rlM=
 Created-By: 1.8.0_51 (Oracle Corporation)
 
-Name: plugins/org.birenheide.bf.source_1.0.3.jar
-SHA-256-Digest: kXLiYADGseZFg5MfgeIT4JZOiXZlKBKpli1fBdOSMMc=
-
-Name: plugins/org.birenheide.bf.debug_1.0.3.jar
-SHA-256-Digest: s9K8Lh3khgSgg0uArNWuPYLaf6jsvAJB/kr304mDP7c=
-
-Name: features/org.birenheide.bf.feature_1.0.3.jar
-SHA-256-Digest: AN7NDph5wZP/IETcrKWKsfHHSqTZjFodClUoKBjwsp8=
-
 Name: content.xml.xz
-SHA-256-Digest: KallQokjqtk0xkr7XCL+Q2/PWmgZSxOxvNwQINtaZqs=
+SHA-256-Digest: EpkFbs+8HPLVW5THcWnsFYBNjrZt6hiJdU/uSGT1c78=
 
-Name: plugins/org.birenheide.bf.help_1.0.3.jar
-SHA-256-Digest: hN49xsNE+iUHWLfIupXFYCqigWMwvL+IjPmDLnphCxc=
+Name: plugins/org.birenheide.bf.help.source_1.0.4.jar
+SHA-256-Digest: /TnWcyWOxmtc1XjhcBCo9jzI3ubJIggA4pG78JbdAOk=
+
+Name: plugins/org.birenheide.bf.debug.source_1.0.4.jar
+SHA-256-Digest: PAucPh63/JDBXAnuVWNCZYPZy3CI48h25O369tS0kjI=
 
 Name: artifacts.xml.xz
-SHA-256-Digest: jIj75JoFTbDGr6Vh73A2MZm/G0pu7RmQRfahFLJLZ0E=
+SHA-256-Digest: IwWUPliG0CdtlopLZm2Z0W3t0gAYIrqheMx28IXWA8w=
 
-Name: features/org.birenheide.bf.feature.source_1.0.3.jar
-SHA-256-Digest: 6TjyIboQodILIRR4qjX1pSj4V07MbYW+c2Dt3rQw7OA=
+Name: plugins/org.birenheide.bf.source_1.0.4.jar
+SHA-256-Digest: pvnU/0rzrR5aaqvtCcqM3lxeKxwUtJSVKEeEvenhRbM=
+
+Name: features/org.birenheide.bf.feature.source_1.0.4.jar
+SHA-256-Digest: I8fmQTlYa1b9ltK80uzdXuKpaBGKoZBTNz/aWwHUswk=
 
 Name: artifacts.jar
-SHA-256-Digest: GzevJn9H5bgiHkHmURCyhyHXqOyDQyzwawhBSd+HsyM=
+SHA-256-Digest: UO3TL8l4wMudL2pL6XlqFGrSLHU3cJbQKXeyyNEFpz4=
 
 Name: p2.index
-SHA-256-Digest: F/5bln017WmW0tZYTvJd1es5U3M855PRy41/u6retmo=
+SHA-256-Digest: 7ODJUwTTPyW1SI3KhNv3HQW9rG5Qex//gkOQXSWIT34=
 
-Name: plugins/org.birenheide.bf_1.0.3.jar
-SHA-256-Digest: TlNGh0SEmH7nHOcjpC9jQm1Q9PfHHldFucBJE0PnCpo=
+Name: plugins/org.birenheide.bf.help_1.0.4.jar
+SHA-256-Digest: 5ghE4/4liBpc+jPCCI0HO20g/nqZAqa3UX7TfznX/bQ=
 
-Name: plugins/org.birenheide.bf.debug.source_1.0.3.jar
-SHA-256-Digest: nksbxLYZIz/dZEztDc67p89kIhyv2OxiBSoICjoU6O0=
+Name: plugins/org.birenheide.bf_1.0.4.jar
+SHA-256-Digest: oAfX7uF4TizblNImzR4Cm/YD4WLKPv2tP9LDvoiLkDk=
 
 Name: content.jar
-SHA-256-Digest: 2piKk/dyqo1lhPZSI/VOZvabOG+XUAv2K+o+SLf7kk4=
+SHA-256-Digest: jiA8EMEYcET84oPxiQaGrJRDIzSNW4NjvQnN11sGw6Y=
 
-Name: plugins/org.birenheide.bf.help.source_1.0.3.jar
-SHA-256-Digest: 98QrzypJTeJYwDzm8i/Yg/f/UPs1V9CprqEhpUU2cTg=
+Name: plugins/org.birenheide.bf.debug_1.0.4.jar
+SHA-256-Digest: uZfNLFx5/P4pyH2502i+tk1Zlt6TuTB685We6bNB9PI=
+
+Name: features/org.birenheide.bf.feature_1.0.4.jar
+SHA-256-Digest: Sm6eBqiijyTsL4I1QPugcwrWMpGJ4S9gXUtlo1wLf5A=
 
