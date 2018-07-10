@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.birenheide.bf</groupId>
         <artifactId>ecl-parent</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.5-SNAPSHOT</version>
         <relativePath>../org.birenheide.bf.ecl.parent</relativePath>
     </parent>
 
