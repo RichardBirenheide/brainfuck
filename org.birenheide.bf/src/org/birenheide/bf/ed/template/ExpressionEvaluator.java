@@ -125,7 +125,7 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 				this.sign = '-';
 			}
 			else {
-				this.sign = '+';
+				this.sign = ' ';
 			}
 			if (check.isEmpty()) {
 				throw new TemplateException("Invalid variable: " + expression);
@@ -163,7 +163,7 @@ abstract class ExpressionEvaluator extends TemplateVariableResolver {
 				parseValue = this.value;
 			}
 			try {
-				return Integer.parseInt(parseValue);
+				return Integer.parseInt(parseValue.trim());
 			}
 			catch (NumberFormatException ex) {
 				throw new VariableEvaluationException(ex.getMessage(), ex);
