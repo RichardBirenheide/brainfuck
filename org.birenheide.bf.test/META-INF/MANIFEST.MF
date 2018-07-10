@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Editor Test Fragment
 Bundle-SymbolicName: org.birenheide.bf.test
-Bundle-Version: 1.0.4.qualifier
+Bundle-Version: 1.0.4
 Fragment-Host: org.birenheide.bf;bundle-version="1.0.4"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit;bundle-version="4.0.0"

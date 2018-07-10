@@ -2,7 +2,7 @@
 <feature
       id="org.birenheide.bf.feature"
       label="%feature.label"
-      version="1.0.4.qualifier"
+      version="1.0.4"
       provider-name="%feature.vendor">
 
    <description>
